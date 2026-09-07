@@ -1,0 +1,1335 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Basket USD — пул</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg0:#0d0e14;--bg1:#13141c;--bg2:#1a1b26;--bg3:#22243a;
+  --border:#2a2d45;--border2:#363a5a;
+  --txt:#e8eaf6;--txt2:#8b8fa8;--txt3:#555870;
+  --purple:#7c6ff7;--purple2:#a89af7;--purple-bg:#1e1a3a;
+  --green:#1fd18a;--green-bg:#0d2620;
+  --red:#f06060;--red-bg:#2a1414;
+  --amber:#f5a623;--amber-bg:#2a2010;--blue:#5b8af7;
+  --font:Inter,-apple-system,sans-serif;
+}
+body{background:var(--bg0);color:var(--txt);font-family:var(--font);min-height:100vh}
+
+.nav{display:flex;align-items:center;justify-content:space-between;padding:14px 28px;border-bottom:1px solid var(--border);background:var(--bg1);position:sticky;top:0;z-index:10}
+.nav-logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--green));display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff}
+.logo-name{font-size:15px;font-weight:700}
+.net-pill{font-size:11px;padding:3px 10px;border-radius:20px;background:var(--purple-bg);color:var(--purple2);border:1px solid var(--border2)}
+.admin-pill{font-size:11px;padding:3px 10px;border-radius:20px;background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber);display:none}
+.btn-wallet{font-size:13px;padding:7px 16px;border-radius:12px;border:1px solid var(--border2);background:var(--bg2);color:var(--txt);cursor:pointer;transition:all .15s}
+.btn-wallet:hover{border-color:var(--purple);color:var(--purple2)}
+.btn-wallet.connected{border-color:var(--green);color:var(--green)}
+.addr-mono{font-family:monospace;font-size:11px;color:var(--txt3)}
+
+.main{padding:20px 28px;max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 400px;gap:20px;align-items:start}
+@media(max-width:880px){.main{grid-template-columns:1fr;padding:14px}}
+
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+@media(max-width:600px){.stats-row{grid-template-columns:1fr 1fr}}
+.stat-card{background:var(--bg1);border:1px solid var(--border);border-radius:14px;padding:14px 16px}
+.stat-label{font-size:11px;color:var(--txt3);margin-bottom:5px}
+.stat-val{font-size:22px;font-weight:700;color:var(--txt)}
+.stat-sub{font-size:11px;color:var(--txt3);margin-top:3px}
+
+.card{background:var(--bg1);border:1px solid var(--border);border-radius:16px;padding:18px 20px;margin-bottom:16px}
+.card-title{font-size:12px;font-weight:700;color:var(--txt2);margin-bottom:14px}
+
+.bal-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.bal-item{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:10px}
+.bal-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.bal-info{flex:1;min-width:0}
+.bal-name{font-size:12px;color:var(--txt3)}
+.bal-val{font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.bar-row{margin-bottom:12px}
+.bar-top{display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px}
+.bar-name{font-weight:600}
+.bar-val{color:var(--txt2)}
+.bar-bg{height:5px;border-radius:3px;background:var(--bg3);overflow:hidden;position:relative}
+.bar-fill{height:100%;border-radius:3px;transition:width .6s}
+.bar-cap{position:absolute;top:-2px;width:2px;height:9px;background:var(--red);opacity:.7}
+.paused-tag{font-size:10px;padding:1px 6px;border-radius:6px;background:var(--red-bg);color:var(--red);margin-left:6px}
+
+.fee-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:12px}
+.fee-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.fee-name{color:var(--txt2);flex:1}
+.fee-val{font-weight:600}
+
+.panel{background:var(--bg1);border:1px solid var(--border);border-radius:20px;padding:20px;position:sticky;top:72px;max-height:calc(100vh - 92px);overflow-y:auto}
+.tabs{display:flex;gap:3px;background:var(--bg2);border-radius:12px;padding:4px;margin-bottom:18px;flex-wrap:wrap}
+.tab{flex:1;min-width:56px;padding:8px 4px;font-size:12px;font-weight:700;text-align:center;cursor:pointer;border-radius:9px;border:none;background:transparent;color:var(--txt3);transition:all .15s}
+.tab.active{background:var(--bg3);color:var(--txt)}
+.tab.admin.active{background:var(--amber-bg);color:var(--amber)}
+.tab.admin{display:none}
+
+.token-input{background:var(--bg2);border:1px solid var(--border);border-radius:13px;padding:14px 16px;margin-bottom:8px}
+.token-input:focus-within{border-color:var(--border2)}
+.ti-label{font-size:11px;color:var(--txt3);margin-bottom:8px}
+.ti-row{display:flex;align-items:center;gap:8px}
+.ti-amt{flex:1;background:transparent;border:none;font-size:22px;font-weight:700;color:var(--txt);outline:none;min-width:0;width:100%}
+.ti-amt::placeholder{color:var(--txt3)}
+.ti-select{background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:7px 10px;font-size:13px;font-weight:700;color:var(--txt);cursor:pointer;outline:none}
+.ti-tag{background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:7px 12px;font-size:13px;font-weight:700;color:var(--txt2)}
+
+.arrow-btn{display:flex;justify-content:center;margin:4px 0}
+.arrow-btn button{background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:6px 16px;color:var(--txt2);cursor:pointer;font-size:17px}
+.arrow-btn button:hover{color:var(--txt);border-color:var(--purple)}
+
+.quote-box{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin:10px 0}
+.qb-label{font-size:11px;color:var(--txt3);margin-bottom:4px}
+.qb-val{font-size:20px;font-weight:700;color:var(--green)}
+.qb-sub{font-size:11px;color:var(--txt3);margin-top:3px;line-height:1.5}
+
+.slip-row{display:flex;align-items:center;gap:6px;margin:10px 0;flex-wrap:wrap}
+.slip-label{font-size:11px;color:var(--txt3)}
+.slip-btn{font-size:12px;padding:4px 10px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--txt3);cursor:pointer}
+.slip-btn:hover{border-color:var(--border2);color:var(--txt2)}
+.slip-btn.active{border-color:var(--purple);color:var(--purple2);background:var(--purple-bg)}
+.slip-inp{width:55px;padding:4px 7px;font-size:12px;border-radius:8px;border:1px solid var(--border);background:var(--bg2);color:var(--txt);outline:none}
+
+.btn-action{width:100%;padding:14px;font-size:14px;font-weight:800;border-radius:14px;border:none;background:linear-gradient(90deg,var(--purple),var(--blue));color:#fff;cursor:pointer;margin-top:10px}
+.btn-action:hover{opacity:.9}
+.btn-action:active{transform:scale(.99)}
+.btn-action:disabled{opacity:.3;cursor:not-allowed}
+.btn-action.red{background:linear-gradient(90deg,#c0392b,var(--red))}
+.btn-action.amber{background:linear-gradient(90deg,#b8791a,var(--amber));color:#1a1200}
+.btn-sm{padding:8px 12px;font-size:12px;font-weight:700;border-radius:10px;border:1px solid var(--border2);background:var(--bg2);color:var(--txt);cursor:pointer;margin:0}
+.btn-sm:hover{border-color:var(--purple)}
+.btn-sm:disabled{opacity:.3;cursor:not-allowed}
+.btn-sm.danger{border-color:#5a2020;color:var(--red)}
+
+.status{font-size:12px;padding:10px 14px;border-radius:10px;margin-bottom:12px;display:none;line-height:1.5;word-break:break-word}
+.status.info{background:var(--purple-bg);color:var(--purple2);display:block}
+.status.success{background:var(--green-bg);color:var(--green);display:block}
+.status.error{background:var(--red-bg);color:var(--red);display:block}
+
+.divider{display:flex;align-items:center;gap:8px;margin:14px 0 10px;font-size:11px;color:var(--txt3)}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+
+.burn-all{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:8px 0}
+.ba-item{background:var(--bg2);border:1px solid var(--border);border-radius:11px;padding:9px 11px;cursor:pointer}
+.ba-item:hover{border-color:var(--border2)}
+.ba-item.selected{border-color:var(--purple)}
+.ba-item.closed{opacity:.45;cursor:not-allowed}
+.ba-name{font-size:11px;color:var(--txt3);margin-bottom:3px}
+.ba-val{font-size:14px;font-weight:700}
+
+.forfeit-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:8px 0}
+.ff-item{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:8px 10px;display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px}
+.ff-item.on{border-color:var(--red);background:var(--red-bg)}
+.ff-item input{accent-color:var(--red)}
+
+/* ADMIN */
+.adm-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:7px 0;border-bottom:1px solid var(--border)}
+.adm-row:last-child{border-bottom:none}
+.adm-k{color:var(--txt3)}
+.adm-v{font-weight:600;font-family:monospace;font-size:11px;text-align:right;word-break:break-all;max-width:60%}
+.adm-inp{width:100%;padding:9px 11px;font-size:13px;border-radius:10px;border:1px solid var(--border);background:var(--bg2);color:var(--txt);outline:none;margin-bottom:6px;font-family:monospace}
+.adm-inp:focus{border-color:var(--border2)}
+.adm-grid2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.adm-grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.pending{background:var(--amber-bg);border:1px solid var(--amber);border-radius:11px;padding:10px 12px;margin:8px 0;font-size:12px;line-height:1.6}
+.pending-none{background:var(--bg2);border:1px solid var(--border);border-radius:11px;padding:10px 12px;margin:8px 0;font-size:12px;color:var(--txt3)}
+.warn{background:var(--red-bg);border:1px solid #5a2020;border-radius:11px;padding:10px 12px;margin:8px 0;font-size:11px;color:#ffb0b0;line-height:1.6}
+.stake-info{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.si-item{background:var(--bg2);border:1px solid var(--border);border-radius:11px;padding:10px 12px}
+.si-label{font-size:11px;color:var(--txt3);margin-bottom:4px}
+.si-val{font-size:15px;font-weight:700}
+.note{font-size:11px;color:var(--txt3);line-height:1.6;margin:6px 0}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-logo">
+    <div class="logo-icon">BSK</div>
+    <span class="logo-name">Basket USD</span>
+    <span class="net-pill">Sepolia</span>
+    <span class="admin-pill" id="admin-pill">admin</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px">
+    <span class="addr-mono" id="addr-display"></span>
+    <button class="btn-wallet" id="btn-wallet" onclick="connectWallet()">Подключить кошелёк</button>
+  </div>
+</nav>
+
+<div class="main">
+  <div>
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-label">Выпущено</div><div class="stat-val" id="st-supply">—</div><div class="stat-sub">BSKUSD</div></div>
+      <div class="stat-card"><div class="stat-label">Мой баланс</div><div class="stat-val" id="st-balance">—</div><div class="stat-sub" id="st-bal-sub">кошелёк не подключён</div></div>
+      <div class="stat-card"><div class="stat-label">Инвариант D</div><div class="stat-val" id="st-d">—</div><div class="stat-sub" id="st-d-sub">обеспечение</div></div>
+      <div class="stat-card"><div class="stat-label">Параметр A</div><div class="stat-val" id="st-a">—</div><div class="stat-sub" id="st-cap">потолок доли —</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Мои балансы</div>
+      <div class="bal-grid" id="bal-grid"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Состав корзины</div>
+      <div id="pool-bars"><div style="font-size:13px;color:var(--txt3)">Загрузка…</div></div>
+      <div class="note" id="cap-note"></div>
+    </div>
+
+    <div class="card" id="card-pending" style="display:none;border-color:var(--amber)">
+      <div class="card-title" style="color:var(--amber)">Объявленные изменения</div>
+      <div id="pending-list"></div>
+      <div class="note">Каждое изменение объявляется заранее, чтобы несогласный успел выйти. До наступления срока ничего не происходит.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Пределы операций</div>
+      <div id="limits"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Куда идёт комиссия</div>
+      <div class="fee-row"><div class="fee-dot" style="background:var(--amber)"></div><div class="fee-name">Казна</div><div class="fee-val" id="fd-treasury">—</div></div>
+      <div class="fee-row"><div class="fee-dot" style="background:var(--purple)"></div><div class="fee-name">Стейкеры wsUSD</div><div class="fee-val" id="fd-wsusd">—</div></div>
+      <div class="note" id="fd-note"></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="status" id="status-msg"></div>
+    <div class="tabs">
+      <button class="tab active" data-tab="swap" onclick="setTab('swap',this)">Обмен</button>
+      <button class="tab" data-tab="mint" onclick="setTab('mint',this)">Внести</button>
+      <button class="tab" data-tab="burn" onclick="setTab('burn',this)">Вывести</button>
+      <button class="tab" data-tab="prop" onclick="setTab('prop',this)">Корзиной</button>
+      <button class="tab" data-tab="stake" onclick="setTab('stake',this)">Стейкинг</button>
+      <button class="tab admin" data-tab="admin" id="tab-admin" onclick="setTab('admin',this)">Админ</button>
+    </div>
+
+    <!-- ОБМЕН -->
+    <div id="pnl-swap">
+      <div class="token-input">
+        <div class="ti-label">Отдаёте</div>
+        <div class="ti-row">
+          <input class="ti-amt" id="sw-amt" type="number" placeholder="0.0" oninput="dq('sw')" min="0"/>
+          <select class="ti-select" id="sw-from" onchange="dq('sw')"></select>
+        </div>
+      </div>
+      <div class="arrow-btn"><button onclick="flipSwap()">⇅</button></div>
+      <div class="token-input">
+        <div class="ti-label">Получите</div>
+        <div class="ti-row">
+          <input class="ti-amt" id="sw-out" placeholder="0.0" readonly style="color:var(--green)"/>
+          <select class="ti-select" id="sw-to" onchange="dq('sw')"></select>
+        </div>
+      </div>
+      <div class="quote-box" id="sw-qbox" style="display:none">
+        <div class="qb-label">Курс</div>
+        <div class="qb-val" id="sw-rate">—</div>
+        <div class="qb-sub" id="sw-sub"></div>
+      </div>
+      <div class="slip-row">
+        <span class="slip-label">Допуск проскальзывания</span>
+        <button class="slip-btn active" onclick="setSlip('sw',0.1,this)">0.1%</button>
+        <button class="slip-btn" onclick="setSlip('sw',0.5,this)">0.5%</button>
+        <button class="slip-btn" onclick="setSlip('sw',1,this)">1%</button>
+        <input class="slip-inp" type="number" placeholder="%" oninput="cSlip('sw',this)"/>
+      </div>
+      <button class="btn-action" id="btn-swap" onclick="doSwap()" disabled>Обменять</button>
+    </div>
+
+    <!-- ВНЕСТИ -->
+    <div id="pnl-mint" style="display:none">
+      <div class="token-input">
+        <div class="ti-label">Вносите</div>
+        <div class="ti-row">
+          <input class="ti-amt" id="mt-amt" type="number" placeholder="0.0" oninput="dq('mt')" min="0"/>
+          <select class="ti-select" id="mt-tok" onchange="dq('mt')"></select>
+        </div>
+      </div>
+      <div class="quote-box">
+        <div class="qb-label">Получите</div>
+        <div class="qb-val" id="mt-quote">—</div>
+        <div class="qb-sub" id="mt-sub"></div>
+      </div>
+      <div class="slip-row">
+        <span class="slip-label">Допуск</span>
+        <button class="slip-btn active" onclick="setSlip('mt',0.1,this)">0.1%</button>
+        <button class="slip-btn" onclick="setSlip('mt',0.5,this)">0.5%</button>
+        <button class="slip-btn" onclick="setSlip('mt',1,this)">1%</button>
+      </div>
+      <button class="btn-action" id="btn-mint" onclick="doMint()" disabled>Внести и получить BSKUSD</button>
+    </div>
+
+    <!-- ВЫВЕСТИ -->
+    <div id="pnl-burn" style="display:none">
+      <div class="token-input">
+        <div class="ti-label">Сжигаете</div>
+        <div class="ti-row">
+          <input class="ti-amt" id="bn-amt" type="number" placeholder="0.0" oninput="dq('bn')" min="0"/>
+          <div class="ti-tag">BSKUSD</div>
+        </div>
+      </div>
+      <div class="divider">в какой токен</div>
+      <div class="burn-all" id="bn-all"></div>
+      <div class="quote-box">
+        <div class="qb-label">Получите</div>
+        <div class="qb-val" id="bn-quote">—</div>
+        <div class="qb-sub" id="bn-sub"></div>
+      </div>
+      <div class="slip-row">
+        <span class="slip-label">Допуск</span>
+        <button class="slip-btn active" onclick="setSlip('bn',0.1,this)">0.1%</button>
+        <button class="slip-btn" onclick="setSlip('bn',0.5,this)">0.5%</button>
+        <button class="slip-btn" onclick="setSlip('bn',1,this)">1%</button>
+      </div>
+      <button class="btn-action" id="btn-burn" onclick="doBurn()" disabled>Сжечь и получить токен</button>
+    </div>
+
+    <!-- КОРЗИНОЙ -->
+    <div id="pnl-prop" style="display:none">
+      <div class="note">
+        Внести или вывести все токены в пропорции пула. <span style="color:var(--green)">Без проскальзывания</span>, потолок доли не применяется.
+      </div>
+
+      <div class="divider">внести корзиной</div>
+      <div class="token-input">
+        <div class="ti-label">Хочу получить BSKUSD</div>
+        <div class="ti-row">
+          <input class="ti-amt" id="pm-bsk" type="number" placeholder="0.0" oninput="dq('pm')" min="0"/>
+          <div class="ti-tag">BSKUSD</div>
+        </div>
+      </div>
+      <div id="pm-amounts" class="burn-all"></div>
+      <div class="quote-box">
+        <div class="qb-label">Получите после комиссии</div>
+        <div class="qb-val" id="pm-quote">—</div>
+        <div class="qb-sub" id="pm-sub"></div>
+      </div>
+      <button class="btn-action" id="btn-pmint" onclick="doPropMint()" disabled>Внести корзиной</button>
+
+      <div class="divider">вывести корзиной</div>
+      <div class="token-input">
+        <div class="ti-label">Сжигаете</div>
+        <div class="ti-row">
+          <input class="ti-amt" id="pb-bsk" type="number" placeholder="0.0" oninput="dq('pb')" min="0"/>
+          <div class="ti-tag">BSKUSD</div>
+        </div>
+      </div>
+      <div id="pb-amounts" class="burn-all"></div>
+      <div class="qb-sub" id="pb-sub" style="margin:6px 0"></div>
+
+      <div class="divider">отказ от доли</div>
+      <div class="note">
+        Если токен заблокировал переводы, вывод корзиной откатится целиком. Отметьте такой слот — вы <b>отказываетесь</b> от его доли, она остаётся в пуле, и вывод пройдёт по остальным.
+      </div>
+      <div class="forfeit-grid" id="pb-forfeit"></div>
+      <div class="warn" id="pb-warn" style="display:none">Вы отказываетесь от доли отмеченных слотов. Эти средства останутся в пуле и достанутся оставшимся держателям.</div>
+
+      <button class="btn-action red" id="btn-pburn" onclick="doPropBurn()" disabled>Вывести корзиной</button>
+    </div>
+
+    <!-- СТЕЙКИНГ -->
+    <div id="pnl-stake" style="display:none">
+      <div id="stake-off" style="display:none">
+        <div class="pending-none" style="padding:16px 14px;line-height:1.7">
+          <b style="color:var(--txt2)">Стейкинг недоступен</b><br/>
+          Вейл <code>wsUSD</code> не подключён к пулу: <code>wsUSD()</code> возвращает нулевой адрес.
+          <br/><br/>
+          Пока это так, <b>вся комиссия идёт в казну</b>. Держателям BSKUSD стейкинг не нужен — доход
+          на базовый токен не начисляется ни при каком раскладе, virtual price закреплён на единице.
+          <br/><br/>
+          Раздел заработает, когда администратор вызовет <code>set_wsUSD</code>.
+        </div>
+      </div>
+
+      <div id="stake-on" style="display:none">
+        <div class="note">
+          Стейкинг даёт долю потока комиссий. Базовый BSKUSD в цене не растёт — доход получают
+          только стейкеры и держатели казначейского токена.
+        </div>
+        <div class="stake-info">
+          <div class="si-item"><div class="si-label">Курс</div><div class="si-val" id="sk-rate">—</div></div>
+          <div class="si-item"><div class="si-label">Всего в вейле</div><div class="si-val" id="sk-total">—</div></div>
+          <div class="si-item"><div class="si-label">Мои wsUSD</div><div class="si-val" id="sk-mine">—</div></div>
+          <div class="si-item"><div class="si-label">Стоят сейчас</div><div class="si-val" id="sk-value" style="color:var(--green)">—</div></div>
+        </div>
+
+        <div class="divider">застейкать</div>
+        <div class="token-input">
+          <div class="ti-label">Отдаёте</div>
+          <div class="ti-row">
+            <input class="ti-amt" id="sk-in" type="number" placeholder="0.0" oninput="dq('sk')" min="0"/>
+            <div class="ti-tag">BSKUSD</div>
+          </div>
+        </div>
+        <div class="quote-box">
+          <div class="qb-label">Получите</div>
+          <div class="qb-val" id="sk-quote">—</div>
+          <div class="qb-sub" id="sk-sub"></div>
+        </div>
+        <button class="btn-action" id="btn-stake" onclick="doStake()" disabled>Застейкать</button>
+
+        <div class="divider">забрать</div>
+        <div class="token-input">
+          <div class="ti-label">Отдаёте</div>
+          <div class="ti-row">
+            <input class="ti-amt" id="sk-out" type="number" placeholder="0.0" oninput="dq('un')" min="0"/>
+            <div class="ti-tag">wsUSD</div>
+          </div>
+        </div>
+        <div class="quote-box">
+          <div class="qb-label">Получите</div>
+          <div class="qb-val" id="un-quote">—</div>
+          <div class="qb-sub" id="un-sub"></div>
+        </div>
+        <button class="btn-action red" id="btn-unstake" onclick="doUnstake()" disabled>Забрать из стейкинга</button>
+      </div>
+    </div>
+
+    <!-- АДМИН -->
+    <div id="pnl-admin" style="display:none">
+      <div class="card-title">Состояние</div>
+      <div id="adm-state"></div>
+
+      <div id="adm-bootstrap" style="display:none">
+        <div class="divider">запуск пула</div>
+        <div class="warn">
+          <b>bootstrap</b> спишет стартовые суммы с вашего адреса и выпустит начальный сапплай. Перед вызовом выдайте approve по каждому токену на адрес пула. Вызывается один раз и необратим.
+        </div>
+        <button class="btn-action amber" onclick="admCall('bootstrap',[])">Запустить пул</button>
+      </div>
+
+      <div class="divider">пауза слота</div>
+      <div class="note">Пауза перекрывает только <b>приток</b>: минт, вход обменом, корзинный минт. Выходы работают всегда. Ставит guardian или админ, снимает только админ.</div>
+      <div class="adm-grid2" id="adm-pause"></div>
+
+      <div class="divider">guardian</div>
+      <input class="adm-inp" id="adm-guardian" placeholder="0x… адрес guardian"/>
+      <button class="btn-sm" style="width:100%" onclick="admCall('set_guardian',[val('adm-guardian')])">Назначить guardian</button>
+
+      <div class="divider">добавить пятый актив</div>
+      <div id="adm-addtoken-pending"></div>
+      <div class="note" id="adm-nexta"></div>
+      <input class="adm-inp" id="adm-nt-addr" placeholder="0x… адрес нового токена"/>
+      <input class="adm-inp" id="adm-nt-amt" placeholder="сумма в СЫРЫХ единицах токена"/>
+      <div class="adm-grid3">
+        <button class="btn-sm" onclick="admCall('schedule_add_token',[val('adm-nt-addr'),val('adm-nt-amt')])">Объявить</button>
+        <button class="btn-sm" onclick="admCall('execute_add_token',[0])">Исполнить</button>
+        <button class="btn-sm danger" onclick="admCall('cancel_add_token',[])">Отменить</button>
+      </div>
+      <div class="note">Уведомление 30 дней, окно исполнения 14. Параметр A пересчитается сам и упадёт примерно в двенадцать раз. Токены спишутся с вашего адреса <b>в момент исполнения</b> — заранее выдайте approve.</div>
+
+      <div class="divider">замена мёртвого слота</div>
+      <div id="adm-rot-state"></div>
+      <input class="adm-inp" id="adm-rot-slot" placeholder="номер слота"/>
+      <input class="adm-inp" id="adm-rot-token" placeholder="0x… адрес токена на замену"/>
+      <input class="adm-inp" id="adm-rot-amt" placeholder="сумма эскроу в сырых единицах"/>
+      <div class="adm-grid3">
+        <button class="btn-sm" onclick="admCall('fund_rotation',[val('adm-rot-slot'),val('adm-rot-token'),val('adm-rot-amt')])">Внести эскроу</button>
+        <button class="btn-sm" onclick="admCall('schedule_rotation',[val('adm-rot-slot')])">Объявить</button>
+        <button class="btn-sm" onclick="admCall('execute_rotation',[val('adm-rot-slot')])">Исполнить</button>
+      </div>
+      <div class="adm-grid2" style="margin-top:6px">
+        <button class="btn-sm danger" onclick="admCall('cancel_rotation',[val('adm-rot-slot')])">Отменить</button>
+        <button class="btn-sm" onclick="admCall('reclaim_rotation',[val('adm-rot-slot')])">Забрать эскроу</button>
+      </div>
+      <div class="note">Порядок обязателен: пауза → выдержка 7 дней → эскроу → анонс 30 дней → окно 14. Эскроу вносит кто угодно, исполнить может кто угодно.</div>
+
+      <div class="divider">параметр кривой A</div>
+      <div id="adm-a-pending"></div>
+      <input class="adm-inp" id="adm-newa" placeholder="новое A"/>
+      <div class="adm-grid3">
+        <button class="btn-sm" onclick="admCall('schedule_a_change',[val('adm-newa')])">Объявить</button>
+        <button class="btn-sm" onclick="admCall('apply_a_change',[])">Применить</button>
+        <button class="btn-sm danger" onclick="admCall('cancel_a_change',[])">Отменить</button>
+      </div>
+      <div class="note">Шаг не более чем вдвое, не чаще раза в неделю. Уведомление 24 часа, окно 48. Применение требует сбалансированного пула. <b>Заявка аннулируется при добавлении актива.</b></div>
+
+      <div class="divider">раздел комиссии</div>
+      <div id="adm-split-pending"></div>
+      <input class="adm-inp" id="adm-wsusd" placeholder="0x… адрес вейла wsUSD"/>
+      <input class="adm-inp" id="adm-tbp" placeholder="доля КАЗНЫ в базисных пунктах, 5000 = поровну"/>
+      <button class="btn-sm" style="width:100%;margin-bottom:6px" onclick="admCall('set_wsUSD',[val('adm-wsusd'),val('adm-tbp')])">Задать вейл и долю (однократно)</button>
+      <div class="warn">
+        <b>set_wsUSD</b> срабатывает мгновенно и без уведомления. Это единственный вызов, способный сдвинуть поток комиссии сразу. Объявляйте целевую долю публично до вызова.
+      </div>
+      <div class="adm-grid3">
+        <button class="btn-sm" onclick="admCall('schedule_split',[val('adm-tbp')])">Объявить долю</button>
+        <button class="btn-sm" onclick="admCall('apply_split',[])">Применить</button>
+        <button class="btn-sm danger" onclick="admCall('cancel_split',[])">Отменить</button>
+      </div>
+      <div class="note">Коридор 500–9500, шаг не более 1000 за раз, уведомление 7 дней, окно 14. К 100% в казну вернуться нельзя.</div>
+
+      <div class="divider">смена вейла</div>
+      <input class="adm-inp" id="adm-newws" placeholder="0x… новый адрес вейла"/>
+      <div class="adm-grid3">
+        <button class="btn-sm" onclick="admCall('schedule_wsUSD_change',[val('adm-newws')])">Объявить</button>
+        <button class="btn-sm" onclick="admCall('apply_wsUSD_change',[])">Применить</button>
+        <button class="btn-sm danger" onclick="admCall('cancel_wsUSD_change',[])">Отменить</button>
+      </div>
+
+      <div class="divider">передача администрирования</div>
+      <input class="adm-inp" id="adm-newadmin" placeholder="0x… новый админ"/>
+      <div class="adm-grid2">
+        <button class="btn-sm" onclick="admCall('propose_admin',[val('adm-newadmin')])">Предложить</button>
+        <button class="btn-sm" onclick="admCall('accept_admin',[])">Принять</button>
+      </div>
+      <div class="note">Двухшаговая: пока новый адрес не подтвердил, права остаются у текущего. Опечатка не приведёт к потере контроля.</div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+<script>
+// ================================================================
+// КОНФИГУРАЦИЯ
+// ================================================================
+const POOL_ADDR = "0x33bb77F98737A7A9f56D5DeD2952fE8F0Ac29fea"
+const CHAIN_ID  = 11155111
+const RPC_URL   = "https://ethereum-sepolia.publicnode.com"
+const EXPLORER  = "https://sepolia.etherscan.io"
+const MAX_COINS = 5
+const BARS = ["#7c6ff7","#1fd18a","#5b8af7","#f5a623","#f06060"]
+// ================================================================
+
+const POOL_ABI = [
+  "function name() view returns (string)",
+  "function symbol() view returns (string)",
+  "function VERSION() view returns (string)",
+  "function totalSupply() view returns (uint256)",
+  "function balanceOf(address) view returns (uint256)",
+  "function n_coins() view returns (uint256)",
+  "function xp(uint256) view returns (uint256)",
+  "function mul(uint256) view returns (uint256)",
+  "function tokens(uint256) view returns (address)",
+  "function token_decimals(uint256) view returns (uint8)",
+  "function paused(uint256) view returns (bool)",
+  "function paused_since(uint256) view returns (uint256)",
+  "function A() view returns (uint256)",
+  "function current_cap_bp() view returns (uint256)",
+  "function next_a_preview() view returns (uint256)",
+  "function initialized() view returns (bool)",
+  "function admin() view returns (address)",
+  "function guardian() view returns (address)",
+  "function treasury() view returns (address)",
+  "function wsUSD() view returns (address)",
+  "function treasury_bp() view returns (uint256)",
+  "function FEE_BP() view returns (uint256)",
+  "function MIN_DELIVERED_BP() view returns (uint256)",
+  "function get_state() view returns (uint256[5],uint256,uint256,uint256,uint256,uint256)",
+  "function quote_mint_net(uint256,uint256) view returns (uint256)",
+  "function quote_mint_proportional(uint256) view returns (uint256,uint256[5])",
+  "function quote_burn(uint256,uint256) view returns (uint256)",
+  "function quote_burn_each(uint256) view returns (uint256[5])",
+  "function quote_burn_proportional(uint256) view returns (uint256[5])",
+  "function get_dy(uint256,uint256,uint256) view returns (uint256)",
+  "function mint(uint256,uint256,uint256) returns (uint256)",
+  "function mint_proportional(uint256[5],uint256) returns (uint256)",
+  "function burn(uint256,uint256,uint256) returns (uint256)",
+  "function burn_proportional(uint256,uint256[5],bool[5]) returns (uint256[5])",
+  "function exchange(uint256,uint256,uint256,uint256) returns (uint256)",
+  "function pending_token() view returns (address)",
+  "function pending_token_amt() view returns (uint256)",
+  "function pending_token_eta() view returns (uint256)",
+  "function pending_a() view returns (uint256)",
+  "function pending_a_eta() view returns (uint256)",
+  "function pending_treasury_bp() view returns (uint256)",
+  "function pending_split_eta() view returns (uint256)",
+  "function pending_wsUSD() view returns (address)",
+  "function pending_wsUSD_eta() view returns (uint256)",
+  "function rot_token(uint256) view returns (address)",
+  "function rot_amount(uint256) view returns (uint256)",
+  "function rot_funder(uint256) view returns (address)",
+  "function rot_eta(uint256) view returns (uint256)",
+  "function bootstrap()",
+  "function set_guardian(address)",
+  "function pause_token(uint256)",
+  "function unpause_token(uint256)",
+  "function schedule_add_token(address,uint256)",
+  "function execute_add_token(uint256) returns (uint256)",
+  "function cancel_add_token()",
+  "function fund_rotation(uint256,address,uint256)",
+  "function schedule_rotation(uint256)",
+  "function execute_rotation(uint256)",
+  "function cancel_rotation(uint256)",
+  "function reclaim_rotation(uint256)",
+  "function schedule_a_change(uint256)",
+  "function apply_a_change()",
+  "function cancel_a_change()",
+  "function set_wsUSD(address,uint256)",
+  "function schedule_split(uint256)",
+  "function apply_split()",
+  "function cancel_split()",
+  "function schedule_wsUSD_change(address)",
+  "function apply_wsUSD_change()",
+  "function cancel_wsUSD_change()",
+  "function propose_admin(address)",
+  "function accept_admin()",
+]
+const WSUSD_ABI = [
+  "function asset() view returns (address)",
+  "function totalAssets() view returns (uint256)",
+  "function totalSupply() view returns (uint256)",
+  "function balanceOf(address) view returns (uint256)",
+  "function convertToAssets(uint256) view returns (uint256)",
+  "function previewDeposit(uint256) view returns (uint256)",
+  "function previewRedeem(uint256) view returns (uint256)",
+  "function deposit(uint256,address) returns (uint256)",
+  "function redeem(uint256,address,address) returns (uint256)",
+]
+const ERC20_ABI = [
+  "function balanceOf(address) view returns (uint256)",
+  "function approve(address,uint256) returns (bool)",
+  "function allowance(address,address) view returns (uint256)",
+  "function symbol() view returns (string)",
+  "function decimals() view returns (uint8)",
+]
+
+let provider, signer, pool, userAddr, isAdmin = false
+let slip = {sw:0.1, mt:0.1, bn:0.1}
+let burnSel = 0, timers = {}
+let forfeit = [false,false,false,false,false]
+
+// состав корзины читается с контракта, а не хардкодится:
+// после ротации адрес в слоте меняется, и захардкоженный список соврал бы
+let N = 0, TKN = [], NAMES = [], DEC = []
+
+const rpc = new ethers.providers.JsonRpcProvider(RPC_URL)
+const poolRO = new ethers.Contract(POOL_ADDR, POOL_ABI, rpc)
+
+// ---------- вспомогательное ----------
+const val = id => document.getElementById(id).value.trim()
+
+function fmt(bn, dec, dp){
+  const n = parseFloat(ethers.utils.formatUnits(bn, dec))
+  dp = dp ?? (dec === 18 ? 4 : 2)
+  if (n >= 1e6) return (n/1e6).toFixed(2)+'M'
+  if (n >= 1e3) return (n/1e3).toFixed(2)+'K'
+  return n.toFixed(dp)
+}
+function parseAmt(v, dec){
+  try { return ethers.utils.parseUnits(String(parseFloat(v)), dec) } catch { return null }
+}
+function minOut(bn, pct){
+  return bn.mul(Math.floor((1-pct/100)*10000)).div(10000)
+}
+function setStatus(msg, type){
+  const el = document.getElementById('status-msg')
+  el.textContent = msg; el.className = 'status '+type
+  if (type !== 'info') setTimeout(()=>{ if(el.textContent===msg) el.className='status' }, 12000)
+}
+function clearStatus(){ document.getElementById('status-msg').className = 'status' }
+const short = a => a.slice(0,6)+'…'+a.slice(-4)
+
+function eta(ts){
+  if (!ts || ts.eq(0)) return null
+  const now = Math.floor(Date.now()/1000)
+  const t = ts.toNumber()
+  const d = t - now
+  const when = new Date(t*1000).toLocaleString('ru')
+  if (d > 0){
+    const days = Math.floor(d/86400), hrs = Math.floor((d%86400)/3600)
+    return {when, left: days>0 ? `через ${days} д ${hrs} ч` : `через ${hrs} ч`, ready:false}
+  }
+  return {when, left:'срок наступил', ready:true}
+}
+
+// ---------- подключение ----------
+async function connectWallet(){
+  let eth = null
+  if (window.ethereum?.isMetaMask) eth = window.ethereum
+  else if (window.ethereum?.providers) eth = window.ethereum.providers.find(p=>p.isMetaMask)
+  else if (window.ethereum) eth = window.ethereum
+  if (!eth){ setStatus('MetaMask не найден. Установите расширение и обновите страницу.','error'); return }
+
+  try{
+    provider = new ethers.providers.Web3Provider(eth)
+    await provider.send('eth_requestAccounts', [])
+    const net = await provider.getNetwork()
+    if (net.chainId !== CHAIN_ID){
+      try { await eth.request({method:'wallet_switchEthereumChain', params:[{chainId:'0x'+CHAIN_ID.toString(16)}]}) } catch(e){}
+      provider = new ethers.providers.Web3Provider(eth)
+    }
+    signer = provider.getSigner()
+    userAddr = await signer.getAddress()
+    pool = new ethers.Contract(POOL_ADDR, POOL_ABI, signer)
+
+    document.getElementById('btn-wallet').textContent = short(userAddr)
+    document.getElementById('btn-wallet').classList.add('connected')
+    document.getElementById('addr-display').textContent = userAddr
+
+    const adm = await poolRO.admin()
+    isAdmin = adm.toLowerCase() === userAddr.toLowerCase()
+    document.getElementById('admin-pill').style.display = isAdmin ? 'inline-block' : 'none'
+    document.getElementById('tab-admin').style.display  = isAdmin ? 'block' : 'none'
+
+    ;['btn-swap','btn-mint','btn-burn','btn-pmint','btn-pburn'].forEach(id=>{
+      document.getElementById(id).disabled = false
+    })
+    await loadAll()
+    clearStatus()
+  } catch(e){ setStatus('Не удалось подключиться: '+(e.message||e), 'error') }
+}
+
+// ---------- загрузка состава ----------
+async function loadBasket(){
+  const p = pool || poolRO
+  N = (await p.n_coins()).toNumber()
+  TKN = []; NAMES = []; DEC = []
+  for (let i = 0; i < N; i++){
+    const addr = await p.tokens(i)
+    const dec  = await p.token_decimals(i)
+    let sym = 'слот '+i
+    try { sym = await new ethers.Contract(addr, ERC20_ABI, rpc).symbol() } catch(e){}
+    TKN.push(addr); DEC.push(dec); NAMES.push(sym)
+  }
+  // селекторы токенов
+  const opts = NAMES.map((n,i)=>`<option value="${i}">${n}</option>`).join('')
+  document.getElementById('sw-from').innerHTML = opts
+  document.getElementById('sw-to').innerHTML   = opts
+  document.getElementById('mt-tok').innerHTML  = opts
+  if (N > 1) document.getElementById('sw-to').value = '1'
+  // балансы
+  document.getElementById('bal-grid').innerHTML =
+    NAMES.map((n,i)=>`<div class="bal-item"><div class="bal-dot" style="background:${BARS[i]}"></div>
+      <div class="bal-info"><div class="bal-name">${n}</div><div class="bal-val" id="bal-${i}">—</div></div></div>`).join('')
+    + `<div class="bal-item" style="grid-column:span 2"><div class="bal-dot" style="background:#fff"></div>
+       <div class="bal-info"><div class="bal-name">BSKUSD</div><div class="bal-val" id="bal-bsk">—</div></div></div>`
+  // маска отказа
+  document.getElementById('pb-forfeit').innerHTML = NAMES.map((n,i)=>
+    `<label class="ff-item" id="ff-${i}"><input type="checkbox" onchange="tglForfeit(${i},this)"/> ${n}</label>`).join('')
+}
+
+async function loadAll(){
+  await loadStats()
+  await Promise.all([loadBalances(), loadFees(), loadPending(), loadLimits()])
+  if (isAdmin) await loadAdmin()
+}
+
+async function loadStats(){
+  try{
+    const p = pool || poolRO
+    const [xp, D, supply, A, cap, n] = await p.get_state()
+    N = n.toNumber()
+    document.getElementById('st-supply').textContent = fmt(supply,18,2)
+    document.getElementById('st-d').textContent = fmt(D,18,2)
+    document.getElementById('st-a').textContent = A.toString()
+    document.getElementById('st-cap').textContent = 'потолок доли '+(cap.toNumber()/100)+'%'
+
+    // supply <= D — главный инвариант обеспечения
+    const ok = supply.lte(D)
+    const sub = document.getElementById('st-d-sub')
+    sub.textContent = ok ? 'обеспечение в норме' : 'ВНИМАНИЕ: supply > D'
+    sub.style.color = ok ? '' : 'var(--red)'
+
+    const total = xp.slice(0,N).reduce((a,x)=>a.add(x), ethers.BigNumber.from(0))
+    const totalN = parseFloat(ethers.utils.formatUnits(total,18))
+    const capPct = cap.toNumber()/100
+
+    const paused = await Promise.all(Array.from({length:N},(_,i)=>p.paused(i)))
+    document.getElementById('pool-bars').innerHTML = xp.slice(0,N).map((x,i)=>{
+      const pct = totalN>0 ? (parseFloat(ethers.utils.formatUnits(x,18))/totalN*100) : 0
+      const over = pct > capPct
+      const raw = DEC[i]!==undefined ? fmt(x, 18, 2) : '—'
+      return `<div class="bar-row">
+        <div class="bar-top">
+          <span class="bar-name">${NAMES[i]||('слот '+i)}${paused[i]?'<span class="paused-tag">приостановлен</span>':''}</span>
+          <span class="bar-val">${raw} <span style="color:${over?'var(--red)':'var(--txt3)'}">(${pct.toFixed(1)}%)</span></span>
+        </div>
+        <div class="bar-bg">
+          <div class="bar-fill" style="width:${Math.min(pct,100)}%;background:${BARS[i]}"></div>
+          <div class="bar-cap" style="left:${capPct}%"></div>
+        </div>
+      </div>`
+    }).join('')
+    document.getElementById('cap-note').textContent =
+      `Красная метка — потолок ${capPct}%. Актив выше него не может наращивать долю: односторонний вход в него и выход в остальные будут отклонены.`
+  } catch(e){ console.error('loadStats', e) }
+}
+
+async function loadBalances(){
+  if (!userAddr) return
+  const p = pool || poolRO
+  try{
+    for (let i=0;i<N;i++){
+      const b = await new ethers.Contract(TKN[i], ERC20_ABI, rpc).balanceOf(userAddr)
+      const el = document.getElementById('bal-'+i)
+      if (el) el.textContent = fmt(b, DEC[i], DEC[i]===18?4:2)+' '+NAMES[i]
+    }
+    const bsk = await p.balanceOf(userAddr)
+    document.getElementById('bal-bsk').textContent = fmt(bsk,18,4)+' BSKUSD'
+    document.getElementById('st-balance').textContent = fmt(bsk,18,2)
+    document.getElementById('st-bal-sub').textContent = short(userAddr)
+  } catch(e){ console.error('loadBalances', e) }
+}
+
+async function loadFees(){
+  try{
+    const p = pool || poolRO
+    const zero = ethers.constants.AddressZero
+    const [tAddr, wAddr, tbp] = await Promise.all([p.treasury(), p.wsUSD(), p.treasury_bp()])
+    const tBal = await p.balanceOf(tAddr)
+    document.getElementById('fd-treasury').textContent = fmt(tBal,18,2)+' BSKUSD'
+    if (wAddr !== zero){
+      const wBal = await p.balanceOf(wAddr)
+      document.getElementById('fd-wsusd').textContent = fmt(wBal,18,2)+' BSKUSD'
+      document.getElementById('fd-note').textContent =
+        `Комиссия 0.04% со всех операций, делится ${tbp.toNumber()/100}% казне / ${(10000-tbp.toNumber())/100}% стейкерам. Казна ${short(tAddr)}, вейл ${short(wAddr)}.`
+    } else {
+      document.getElementById('fd-wsusd').textContent = 'вейл не задан'
+      document.getElementById('fd-note').textContent =
+        `Комиссия 0.04% со всех операций. Пока вейл не задан, всё идёт в казну ${short(tAddr)}.`
+    }
+  } catch(e){ console.error('loadFees', e) }
+}
+
+// ---------- вкладки ----------
+function setTab(t, btn){
+  ;['swap','mint','burn','prop','stake','admin'].forEach(n=>{
+    const el = document.getElementById('pnl-'+n)
+    if (el) el.style.display = n===t ? 'block' : 'none'
+  })
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'))
+  btn.classList.add('active')
+  clearStatus()
+  if (t==='admin') loadAdmin()
+  if (t==='stake') loadStake()
+}
+function setSlip(k,v,btn){
+  slip[k]=v
+  btn.closest('.slip-row').querySelectorAll('.slip-btn').forEach(b=>b.classList.remove('active'))
+  btn.classList.add('active')
+}
+function cSlip(k,inp){
+  slip[k]=parseFloat(inp.value)||0.5
+  inp.closest('.slip-row').querySelectorAll('.slip-btn').forEach(b=>b.classList.remove('active'))
+}
+function dq(k){
+  clearTimeout(timers[k])
+  const fn = {sw:qSwap, mt:qMint, bn:qBurn, pm:qPropMint, pb:qPropBurn, sk:qStake, un:qUnstake}
+  timers[k]=setTimeout(fn[k],400)
+}
+function flipSwap(){
+  const f=document.getElementById('sw-from'), t=document.getElementById('sw-to')
+  const tmp=f.value; f.value=t.value; t.value=tmp; dq('sw')
+}
+function tglForfeit(i, el){
+  forfeit[i]=el.checked
+  document.getElementById('ff-'+i).classList.toggle('on', el.checked)
+  document.getElementById('pb-warn').style.display = forfeit.some(x=>x)?'block':'none'
+  dq('pb')
+}
+
+// ---------- котировки ----------
+async function qSwap(){
+  const i=+document.getElementById('sw-from').value, j=+document.getElementById('sw-to').value
+  const v=document.getElementById('sw-amt').value
+  const out=document.getElementById('sw-out'), box=document.getElementById('sw-qbox')
+  if (i===j || !v || parseFloat(v)<=0){ out.value=''; box.style.display='none'; return }
+  try{
+    const dx=parseAmt(v,DEC[i]); if(!dx) return
+    const dy=await (pool||poolRO).get_dy(i,j,dx)
+    out.value=fmt(dy,DEC[j],DEC[j]===18?6:4)
+    const rate=parseFloat(ethers.utils.formatUnits(dy,DEC[j]))/parseFloat(v)
+    document.getElementById('sw-rate').textContent=`1 ${NAMES[i]} ≈ ${rate.toFixed(6)} ${NAMES[j]}`
+    document.getElementById('sw-sub').textContent=
+      `Комиссия 0.04% уже учтена. Минимум при допуске ${slip.sw}%: ${fmt(minOut(dy,slip.sw),DEC[j],4)} ${NAMES[j]}`
+    box.style.display='block'
+  } catch(e){
+    out.value=''; box.style.display='block'
+    document.getElementById('sw-rate').textContent='Маршрут закрыт'
+    document.getElementById('sw-sub').textContent='Потолок доли, пол слота или приостановленный актив. Попробуйте другую пару или меньшую сумму.'
+  }
+}
+
+async function qMint(){
+  const i=+document.getElementById('mt-tok').value
+  const v=document.getElementById('mt-amt').value
+  const q=document.getElementById('mt-quote')
+  if(!v||parseFloat(v)<=0){ q.textContent='—'; document.getElementById('mt-sub').textContent=''; return }
+  try{
+    const raw=parseAmt(v,DEC[i]); if(!raw) return
+    const out=await (pool||poolRO).quote_mint_net(i,raw)
+    q.textContent=fmt(out,18,6)+' BSKUSD'
+    const loss=((parseFloat(v)-parseFloat(ethers.utils.formatUnits(out,18)))/parseFloat(v)*100)
+    document.getElementById('mt-sub').textContent=
+      `Потеря ${loss.toFixed(4)}% — комиссия 0.04% плюс проскальзывание от перекоса пула.`
+  } catch(e){
+    q.textContent='Отклонено'
+    document.getElementById('mt-sub').textContent='Слот приостановлен, либо операция упёрлась в потолок доли.'
+  }
+}
+
+async function qBurn(){
+  const v=document.getElementById('bn-amt').value
+  const q=document.getElementById('bn-quote')
+  if(!v||parseFloat(v)<=0){ q.textContent='—'; document.getElementById('bn-all').innerHTML=''; return }
+  try{
+    const raw=parseAmt(v,18); if(!raw) return
+    const all=await (pool||poolRO).quote_burn_each(raw)
+    document.getElementById('bn-all').innerHTML=all.slice(0,N).map((x,i)=>{
+      const closed=x.isZero()
+      return `<div class="ba-item${i===burnSel?' selected':''}${closed?' closed':''}" onclick="${closed?'':`selBurn(${i})`}">
+        <div class="ba-name">${NAMES[i]}</div>
+        <div class="ba-val">${closed?'закрыт':fmt(x,DEC[i],DEC[i]===18?6:4)}</div>
+      </div>`
+    }).join('')
+    const sel=all[burnSel]
+    if (sel.isZero()){
+      q.textContent='Маршрут закрыт'
+      document.getElementById('bn-sub').textContent=
+        'Выход в этот актив упирается в потолок доли или пол слота. Выберите другой токен или выведите корзиной.'
+      return
+    }
+    q.textContent=fmt(sel,DEC[burnSel],DEC[burnSel]===18?6:4)+' '+NAMES[burnSel]
+    document.getElementById('bn-sub').textContent=
+      `Минимум при допуске ${slip.bn}%: ${fmt(minOut(sel,slip.bn),DEC[burnSel],4)} ${NAMES[burnSel]}`
+  } catch(e){ q.textContent='Отклонено' }
+}
+function selBurn(i){
+  burnSel=i
+  document.querySelectorAll('.ba-item').forEach((el,k)=>el.classList.toggle('selected',k===i))
+  dq('bn')
+}
+
+async function qPropMint(){
+  const v=document.getElementById('pm-bsk').value
+  const q=document.getElementById('pm-quote'), a=document.getElementById('pm-amounts')
+  if(!v||parseFloat(v)<=0){ q.textContent='—'; a.innerHTML=''; return }
+  try{
+    const raw=parseAmt(v,18); if(!raw) return
+    const [net,amounts]=await (pool||poolRO).quote_mint_proportional(raw)
+    q.textContent=fmt(net,18,6)+' BSKUSD'
+    document.getElementById('pm-sub').textContent='Комиссия 0.04%, проскальзывания нет и объём не ограничен потолком.'
+    a.innerHTML=amounts.slice(0,N).map((x,i)=>
+      `<div class="ba-item"><div class="ba-name">внести ${NAMES[i]}</div>
+       <div class="ba-val">${fmt(x,DEC[i],DEC[i]===18?6:4)}</div></div>`).join('')
+  } catch(e){ q.textContent='Отклонено'; a.innerHTML='' }
+}
+
+async function qPropBurn(){
+  const v=document.getElementById('pb-bsk').value
+  const a=document.getElementById('pb-amounts')
+  if(!v||parseFloat(v)<=0){ a.innerHTML=''; document.getElementById('pb-sub').textContent=''; return }
+  try{
+    const raw=parseAmt(v,18); if(!raw) return
+    const amounts=await (pool||poolRO).quote_burn_proportional(raw)
+    a.innerHTML=amounts.slice(0,N).map((x,i)=>
+      `<div class="ba-item" style="${forfeit[i]?'opacity:.4':''}">
+        <div class="ba-name">${NAMES[i]}${forfeit[i]?' — отказ':''}</div>
+        <div class="ba-val">${forfeit[i]?'0':fmt(x,DEC[i],DEC[i]===18?6:4)}</div>
+      </div>`).join('')
+    document.getElementById('pb-sub').textContent=
+      'Пропорции текущие, а не равные: чего в пуле больше, того и получите больше. Комиссия 0.04%, проскальзывания нет.'
+  } catch(e){
+    a.innerHTML=''
+    document.getElementById('pb-sub').textContent='Сумма слишком мала: доли по слотам с малым числом знаков усекаются в ноль.'
+  }
+}
+
+// ---------- операции ----------
+async function ensureApprove(tokenAddr, amount, label){
+  const tok=new ethers.Contract(tokenAddr, ERC20_ABI, signer)
+  const al=await tok.allowance(userAddr, POOL_ADDR)
+  if (al.lt(amount)){
+    setStatus('Разрешаю списание '+label+'…','info')
+    await (await tok.approve(POOL_ADDR, ethers.constants.MaxUint256)).wait()
+  }
+}
+function txLink(rc){ return `${EXPLORER}/tx/${rc.transactionHash}` }
+
+async function doSwap(){
+  const i=+document.getElementById('sw-from').value, j=+document.getElementById('sw-to').value
+  if (i===j){ setStatus('Выберите разные токены','error'); return }
+  const v=document.getElementById('sw-amt').value
+  if(!v||parseFloat(v)<=0){ setStatus('Введите сумму','error'); return }
+  try{
+    const dx=parseAmt(v,DEC[i])
+    const dy=await pool.get_dy(i,j,dx)
+    await ensureApprove(TKN[i],dx,NAMES[i])
+    setStatus('Отправляю обмен…','info')
+    await (await pool.exchange(i,j,dx,minOut(dy,slip.sw))).wait()
+    setStatus(`Обменяно ${v} ${NAMES[i]} на ${fmt(dy,DEC[j],4)} ${NAMES[j]}`,'success')
+    await loadAll()
+  } catch(e){ setStatus(errText(e),'error') }
+}
+
+async function doMint(){
+  const i=+document.getElementById('mt-tok').value
+  const v=document.getElementById('mt-amt').value
+  if(!v||parseFloat(v)<=0){ setStatus('Введите сумму','error'); return }
+  try{
+    const raw=parseAmt(v,DEC[i])
+    const q=await pool.quote_mint_net(i,raw)
+    await ensureApprove(TKN[i],raw,NAMES[i])
+    setStatus('Вношу…','info')
+    await (await pool.mint(i,raw,minOut(q,slip.mt))).wait()
+    setStatus(`Получено ${fmt(q,18,4)} BSKUSD`,'success')
+    await loadAll()
+  } catch(e){ setStatus(errText(e),'error') }
+}
+
+async function doBurn(){
+  const v=document.getElementById('bn-amt').value
+  if(!v||parseFloat(v)<=0){ setStatus('Введите сумму','error'); return }
+  try{
+    const raw=parseAmt(v,18)
+    const q=await pool.quote_burn(burnSel,raw)
+    setStatus('Сжигаю…','info')
+    await (await pool.burn(burnSel,raw,minOut(q,slip.bn))).wait()
+    setStatus(`Сожжено ${v} BSKUSD, получено ${fmt(q,DEC[burnSel],4)} ${NAMES[burnSel]}`,'success')
+    await loadAll()
+  } catch(e){ setStatus(errText(e),'error') }
+}
+
+async function doPropMint(){
+  const v=document.getElementById('pm-bsk').value
+  if(!v||parseFloat(v)<=0){ setStatus('Введите сумму','error'); return }
+  try{
+    const raw=parseAmt(v,18)
+    const [net,amounts]=await pool.quote_mint_proportional(raw)
+    for (let i=0;i<N;i++){
+      if (amounts[i].gt(0)) await ensureApprove(TKN[i],amounts[i],NAMES[i])
+    }
+    setStatus('Вношу корзиной…','info')
+    await (await pool.mint_proportional(amounts, net.mul(9990).div(10000))).wait()
+    setStatus(`Получено ${fmt(net,18,4)} BSKUSD`,'success')
+    document.getElementById('pm-bsk').value=''
+    await loadAll()
+  } catch(e){ setStatus(errText(e),'error') }
+}
+
+async function doPropBurn(){
+  const v=document.getElementById('pb-bsk').value
+  if(!v||parseFloat(v)<=0){ setStatus('Введите сумму','error'); return }
+  if (forfeit.slice(0,N).every(x=>x)){
+    setStatus('Нельзя отказаться от всех слотов — вы сожгли бы BSKUSD ни за что.','error'); return
+  }
+  try{
+    const raw=parseAmt(v,18)
+    const amounts=await pool.quote_burn_proportional(raw)
+    // при отказе минимум по слоту обязан быть нулём
+    const mins=amounts.map((a,i)=> forfeit[i] ? ethers.BigNumber.from(0) : a.mul(9900).div(10000))
+    setStatus('Вывожу корзиной…','info')
+    await (await pool.burn_proportional(raw, mins, forfeit)).wait()
+    setStatus(`Выведено ${v} BSKUSD корзиной`,'success')
+    document.getElementById('pb-bsk').value=''
+    await loadAll()
+  } catch(e){ setStatus(errText(e),'error') }
+}
+
+function errText(e){
+  const raw = e?.reason || e?.error?.message || e?.data?.message || e?.message || String(e)
+  if (/user rejected|user denied/i.test(raw)) return 'Транзакция отклонена в кошельке.'
+  if (/insufficient funds/i.test(raw)) return 'Не хватает ETH на газ.'
+  // контракт отдаёт Err(uint256), а не текст: селектор в ABI не попадает
+  if (/execution reverted|CALL_EXCEPTION/i.test(raw))
+    return 'Контракт отклонил операцию. Частые причины: проскальзывание больше допуска, потолок доли, пол слота, приостановленный актив, слишком малая сумма.'
+  return raw
+}
+
+// ---------- предстоящие изменения ----------
+// Пользователю это нужнее, чем админу: добавление актива сузит потолок
+// с 50% до 40%, а смена A изменит проскальзывание. Узнать об этом
+// постфактум — значит не иметь шанса выйти.
+async function loadPending(){
+  const p = pool || poolRO
+  const zero = ethers.constants.AddressZero
+  const items = []
+  try{
+    const [ptEta,ptAddr,paEta,paVal,psEta,psVal,pwEta,pwAddr,nextA] = await Promise.all([
+      p.pending_token_eta(), p.pending_token(),
+      p.pending_a_eta(), p.pending_a(),
+      p.pending_split_eta(), p.pending_treasury_bp(),
+      p.pending_wsUSD_eta(), p.pending_wsUSD(),
+      p.next_a_preview()
+    ])
+    if (!ptEta.eq(0)){
+      const E = eta(ptEta)
+      items.push(`<b>В корзину добавят актив</b> ${short(ptAddr)}.<br/>
+        Потолок доли сузится до 40%, параметр A станет ${nextA.toString()} —
+        проскальзывание вырастет примерно вдвое.<br/>${E.when} — ${E.left}`)
+    }
+    if (!paEta.eq(0)){
+      const E = eta(paEta)
+      items.push(`<b>Параметр кривой станет ${paVal.toString()}</b>.<br/>${E.when} — ${E.left}`)
+    }
+    if (!psEta.eq(0)){
+      const E = eta(psEta)
+      items.push(`<b>Доля казны в комиссии станет ${psVal.toNumber()/100}%</b>.<br/>${E.when} — ${E.left}`)
+    }
+    if (!pwEta.eq(0)){
+      const E = eta(pwEta)
+      items.push(`<b>Получатель доходной части сменится</b> на ${short(pwAddr)}.<br/>${E.when} — ${E.left}`)
+    }
+    // ротации
+    for (let i=0;i<N;i++){
+      const [rt,re] = await Promise.all([p.rot_token(i), p.rot_eta(i)])
+      if (rt !== zero && !re.eq(0)){
+        const E = eta(re)
+        items.push(`<b>Слот ${NAMES[i]||i} заменят</b> на ${short(rt)}.<br/>${E.when} — ${E.left}`)
+      }
+    }
+  } catch(e){ console.error('loadPending', e) }
+
+  const card = document.getElementById('card-pending')
+  if (items.length === 0){ card.style.display='none'; return }
+  card.style.display='block'
+  document.getElementById('pending-list').innerHTML =
+    items.map(t=>`<div class="pending">${t}</div>`).join('')
+}
+
+// ---------- пределы ----------
+// Границы операций видны только по реверту, если их не посчитать заранее.
+async function loadLimits(){
+  const p = pool || poolRO
+  try{
+    const [xp,D,supply,A,cap,n] = await p.get_state()
+    const [feeBp, minDel] = await Promise.all([p.FEE_BP(), p.MIN_DELIVERED_BP()])
+    const nn = n.toNumber()
+    const total = xp.slice(0,nn).reduce((a,x)=>a.add(x), ethers.BigNumber.from(0))
+    const totalN = parseFloat(ethers.utils.formatUnits(total,18))
+    const capF = cap.toNumber()/10000
+    const floorXp = parseFloat(ethers.utils.formatUnits(D,18))/nn*0.005
+
+    // virtual price: должен быть ровно 1
+    const vp = parseFloat(ethers.utils.formatUnits(D,18))/parseFloat(ethers.utils.formatUnits(supply,18))
+
+    const rows = []
+    rows.push(['комиссия', (feeBp.toNumber()/100)+'% со всех операций'])
+    rows.push(['virtual price', vp.toFixed(9)+(Math.abs(vp-1)<1e-6?'':'  ← отклонение')])
+    rows.push(['минимум вывода корзиной', 'доставить не меньше '+(minDel.toNumber()/100)+'% причитающегося'])
+    rows.push(['пол каждого слота', floorXp.toFixed(2)+' — ниже опустить нельзя'])
+
+    // максимальный односторонний вход по каждому слоту
+    const maxIn = xp.slice(0,nn).map((x,i)=>{
+      const xi = parseFloat(ethers.utils.formatUnits(x,18))
+      const m = (capF*totalN - xi)/(1-capF)
+      return m>0 ? m : 0
+    })
+    rows.push(['максимум одностороннего входа',
+      maxIn.map((m,i)=>`${NAMES[i]||i}: ${m.toLocaleString('ru',{maximumFractionDigits:0})}`).join(' · ')])
+
+    document.getElementById('limits').innerHTML = rows.map(([k,v])=>
+      `<div class="adm-row"><span class="adm-k">${k}</span><span class="adm-v" style="font-family:var(--font);font-size:12px">${v}</span></div>`).join('')
+      + `<div class="note">Вход сверх указанного упрётся в потолок доли. Корзиной можно вносить без ограничения — пропорциональный депозит долей не меняет.</div>`
+  } catch(e){ console.error('loadLimits', e) }
+}
+
+// ---------- стейкинг ----------
+let wsusd = null, wsAddr = null
+
+async function loadStake(){
+  const p = pool || poolRO
+  const zero = ethers.constants.AddressZero
+  try{
+    wsAddr = await p.wsUSD()
+  } catch(e){ wsAddr = zero }
+
+  const off = document.getElementById('stake-off')
+  const on  = document.getElementById('stake-on')
+
+  if (!wsAddr || wsAddr === zero){
+    off.style.display = 'block'; on.style.display = 'none'
+    wsusd = null
+    return
+  }
+  off.style.display = 'none'; on.style.display = 'block'
+  wsusd = new ethers.Contract(wsAddr, WSUSD_ABI, signer || rpc)
+
+  if (signer){
+    document.getElementById('btn-stake').disabled = false
+    document.getElementById('btn-unstake').disabled = false
+  }
+
+  try{
+    const [ta, ts] = await Promise.all([wsusd.totalAssets(), wsusd.totalSupply()])
+    document.getElementById('sk-total').textContent = fmt(ta,18,2)+' BSKUSD'
+    if (ts.gt(0)){
+      const r = parseFloat(ethers.utils.formatUnits(ta,18)) / parseFloat(ethers.utils.formatUnits(ts,18))
+      document.getElementById('sk-rate').textContent = '1 wsUSD = '+r.toFixed(6)
+    } else {
+      document.getElementById('sk-rate').textContent = '1 wsUSD = 1.000000'
+    }
+    if (userAddr){
+      const mine = await wsusd.balanceOf(userAddr)
+      document.getElementById('sk-mine').textContent = fmt(mine,18,4)
+      const v = mine.gt(0) ? await wsusd.convertToAssets(mine) : ethers.BigNumber.from(0)
+      document.getElementById('sk-value').textContent = fmt(v,18,4)+' BSKUSD'
+    }
+  } catch(e){ console.error('loadStake', e) }
+}
+
+async function qStake(){
+  if (!wsusd) return
+  const v = document.getElementById('sk-in').value
+  const q = document.getElementById('sk-quote')
+  if (!v || parseFloat(v)<=0){ q.textContent='—'; return }
+  try{
+    const raw = parseAmt(v,18); if(!raw) return
+    const sh = await wsusd.previewDeposit(raw)
+    q.textContent = fmt(sh,18,6)+' wsUSD'
+    document.getElementById('sk-sub').textContent =
+      'Доля в вейле. Растёт по мере поступления комиссий — курс wsUSD к BSKUSD со временем увеличивается.'
+  } catch(e){ q.textContent='Отклонено' }
+}
+
+async function qUnstake(){
+  if (!wsusd) return
+  const v = document.getElementById('sk-out').value
+  const q = document.getElementById('un-quote')
+  if (!v || parseFloat(v)<=0){ q.textContent='—'; return }
+  try{
+    const raw = parseAmt(v,18); if(!raw) return
+    const a = await wsusd.previewRedeem(raw)
+    q.textContent = fmt(a,18,6)+' BSKUSD'
+    document.getElementById('un-sub').textContent = 'Возврат по текущему курсу вейла.'
+  } catch(e){ q.textContent='Отклонено' }
+}
+
+async function doStake(){
+  if (!wsusd){ setStatus('Вейл не подключён','error'); return }
+  const v = document.getElementById('sk-in').value
+  if (!v || parseFloat(v)<=0){ setStatus('Введите сумму','error'); return }
+  try{
+    const raw = parseAmt(v,18)
+    // approve BSKUSD вейлу, а не пулу
+    const bsk = new ethers.Contract(POOL_ADDR, ERC20_ABI, signer)
+    if ((await bsk.allowance(userAddr, wsAddr)).lt(raw)){
+      setStatus('Разрешаю списание BSKUSD…','info')
+      await (await bsk.approve(wsAddr, ethers.constants.MaxUint256)).wait()
+    }
+    const sh = await wsusd.previewDeposit(raw)
+    setStatus('Стейкаю…','info')
+    await (await wsusd.deposit(raw, userAddr)).wait()
+    setStatus(`Застейкано ${v} BSKUSD, получено ${fmt(sh,18,4)} wsUSD`,'success')
+    document.getElementById('sk-in').value=''
+    await loadAll(); await loadStake()
+  } catch(e){ setStatus(errText(e),'error') }
+}
+
+async function doUnstake(){
+  if (!wsusd){ setStatus('Вейл не подключён','error'); return }
+  const v = document.getElementById('sk-out').value
+  if (!v || parseFloat(v)<=0){ setStatus('Введите сумму','error'); return }
+  try{
+    const raw = parseAmt(v,18)
+    const a = await wsusd.previewRedeem(raw)
+    setStatus('Забираю…','info')
+    await (await wsusd.redeem(raw, userAddr, userAddr)).wait()
+    setStatus(`Забрано ${fmt(a,18,4)} BSKUSD`,'success')
+    document.getElementById('sk-out').value=''
+    await loadAll(); await loadStake()
+  } catch(e){ setStatus(errText(e),'error') }
+}
+
+// ---------- админ ----------
+async function loadAdmin(){
+  if (!isAdmin) return
+  const p = pool || poolRO
+  try{
+    const zero = ethers.constants.AddressZero
+    const [ver, adm, grd, tre, ws, init, nextA, tbp, nc] = await Promise.all([
+      p.VERSION(), p.admin(), p.guardian(), p.treasury(), p.wsUSD(),
+      p.initialized(), p.next_a_preview(), p.treasury_bp(), p.n_coins()
+    ])
+    const rows = [
+      ['версия контракта', ver],
+      ['активных слотов', nc.toString()+' из '+MAX_COINS],
+      ['админ', short(adm)],
+      ['guardian', grd===zero ? 'не назначен' : short(grd)],
+      ['казна', short(tre)],
+      ['вейл wsUSD', ws===zero ? 'не задан' : short(ws)],
+      ['доля казны', (tbp.toNumber()/100)+'%'],
+      ['пул запущен', init ? 'да' : 'НЕТ'],
+      ['A после расширения', nextA.eq(0) ? 'расширение невозможно' : nextA.toString()],
+    ]
+    document.getElementById('adm-state').innerHTML = rows.map(([k,v])=>
+      `<div class="adm-row"><span class="adm-k">${k}</span><span class="adm-v">${v}</span></div>`).join('')
+    document.getElementById('adm-bootstrap').style.display = init ? 'none' : 'block'
+
+    document.getElementById('adm-nexta').innerHTML = nextA.eq(0)
+      ? '<span style="color:var(--red)">next_a_preview = 0 — пятый слот добавить уже нельзя. Расширение требует A не ниже 13.</span>'
+      : `После добавления актива A станет <b>${nextA.toString()}</b>, потолок доли сузится до 40%, проскальзывание вырастет примерно вдвое.`
+
+    // паузы по слотам
+    const paused = await Promise.all(Array.from({length:N},(_,i)=>p.paused(i)))
+    document.getElementById('adm-pause').innerHTML = Array.from({length:N},(_,i)=>
+      `<button class="btn-sm ${paused[i]?'danger':''}" onclick="admCall('${paused[i]?'unpause_token':'pause_token'}',[${i}])">
+        ${NAMES[i]||('слот '+i)}: ${paused[i]?'снять паузу':'приостановить'}
+      </button>`).join('')
+
+    // отложенные операции
+    const [ptEta, ptAddr, ptAmt] = await Promise.all([p.pending_token_eta(), p.pending_token(), p.pending_token_amt()])
+    document.getElementById('adm-addtoken-pending').innerHTML = pendingBox(
+      eta(ptEta), ptEta.eq(0) ? null : `Токен ${short(ptAddr)}, сумма ${ptAmt.toString()}`)
+
+    const [paEta, paVal] = await Promise.all([p.pending_a_eta(), p.pending_a()])
+    document.getElementById('adm-a-pending').innerHTML = pendingBox(
+      eta(paEta), paEta.eq(0) ? null : `A станет ${paVal.toString()}`)
+
+    const [psEta, psVal] = await Promise.all([p.pending_split_eta(), p.pending_treasury_bp()])
+    document.getElementById('adm-split-pending').innerHTML = pendingBox(
+      eta(psEta), psEta.eq(0) ? null : `доля казны станет ${psVal.toNumber()/100}%`)
+
+    // ротации по слотам
+    const rots = await Promise.all(Array.from({length:N},async(_,i)=>{
+      const [t,a,f,e] = await Promise.all([p.rot_token(i),p.rot_amount(i),p.rot_funder(i),p.rot_eta(i)])
+      return {i,t,a,f,e}
+    }))
+    const active = rots.filter(r=>r.t !== zero)
+    document.getElementById('adm-rot-state').innerHTML = active.length===0
+      ? '<div class="pending-none">Замен не запланировано.</div>'
+      : active.map(r=>{
+          const E = eta(r.e)
+          return `<div class="pending">
+            <b>Слот ${r.i} → ${short(r.t)}</b><br/>
+            эскроу ${r.a.toString()} от ${short(r.f)}<br/>
+            ${r.e.eq(0) ? 'не объявлена' : `исполнение ${E.when} — ${E.left}`}
+          </div>`
+        }).join('')
+  } catch(e){ console.error('loadAdmin', e) }
+}
+
+function pendingBox(E, detail){
+  if (!E) return '<div class="pending-none">Ничего не запланировано.</div>'
+  return `<div class="pending">${detail||''}<br/>${E.when} — <b>${E.left}</b></div>`
+}
+
+async function admCall(fn, args){
+  if (!signer){ setStatus('Подключите кошелёк','error'); return }
+  try{
+    const clean = args.map(a=>{
+      if (typeof a === 'string' && a === '') throw new Error('Заполните все поля')
+      return a
+    })
+    setStatus('Отправляю '+fn+'…','info')
+    const rc = await (await pool[fn](...clean)).wait()
+    setStatus(fn+' выполнено. Транзакция '+rc.transactionHash.slice(0,10)+'…','success')
+    await loadAll()
+  } catch(e){ setStatus(fn+': '+errText(e),'error') }
+}
+
+// ---------- старт ----------
+;(async ()=>{
+  try{
+    await loadBasket()
+    await loadStats()
+    await loadFees()
+    await loadPending()
+    await loadLimits()
+    await loadStake()
+  } catch(e){
+    setStatus('Не удалось прочитать пул. Проверьте адрес контракта и сеть.','error')
+    console.error(e)
+  }
+})()
+</script>
+</body>
+</html>
