@@ -47,6 +47,25 @@ body{background:var(--bg0);color:var(--txt);font-family:var(--font);min-height:1
 .stack-axis{position:relative;height:18px;margin-bottom:14px}
 .cap-mark{position:absolute;top:0;transform:translateX(-50%);font-size:10px;color:var(--red);white-space:nowrap}
 .cap-mark::before{content:'';position:absolute;left:50%;top:-8px;width:1px;height:8px;background:var(--red)}
+.legend{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-bottom:14px}
+.lg{background:var(--bg2);border:1px solid var(--border);border-radius:11px;padding:9px 11px;cursor:pointer;border-left:3px solid}
+.lg:hover{border-color:var(--border2)}
+.lg-top{display:flex;align-items:center;justify-content:space-between;gap:6px}
+.lg-name{font-size:12px;font-weight:700}
+.lg-share{font-size:11px;color:var(--txt3)}
+.lg-amt{font-size:15px;font-weight:700;margin-top:2px}
+.lg-usd{font-size:11px;color:var(--txt3);margin-top:1px}
+.price-box{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-top:14px;display:none}
+.price-box.show{display:block}
+.pb-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.pb-val{font-size:24px;font-weight:800}
+.pb-lbl{font-size:11px;color:var(--txt3)}
+.pb-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:6px;margin-top:8px}
+.pb-cell{font-size:11px;color:var(--txt3)}
+.pb-cell b{display:block;font-size:13px;color:var(--txt);margin-top:2px}
+.pb-cell.off b{color:var(--red)}
+.btn-max{background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:3px 8px;font-size:10px;font-weight:700;color:var(--txt3);cursor:pointer}
+.btn-max:hover{color:var(--purple2);border-color:var(--purple)}
 .slot-detail{background:var(--bg2);border:1px solid var(--border);border-radius:13px;padding:14px 16px;display:none}
 .slot-detail.show{display:block}
 .sd-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:10px;flex-wrap:wrap}
@@ -178,8 +197,24 @@ body{background:var(--bg0);color:var(--txt);font-family:var(--font);min-height:1
       </div>
       <div class="stack" id="stack"></div>
       <div class="stack-axis" id="stack-axis"></div>
+      <div class="legend" id="legend"></div>
       <div class="slot-detail" id="slot-detail"></div>
-      <div class="note" id="hero-note">Нажмите на сегмент, чтобы раскрыть слот.</div>
+      <div class="note" id="hero-note">Нажмите на сегмент или карточку, чтобы раскрыть слот.</div>
+
+      <div class="price-box" id="price-box">
+        <div class="pb-head">
+          <div>
+            <div class="pb-lbl">Оценка обеспечения по внешним ценам</div>
+            <div class="pb-val" id="pb-value">—</div>
+          </div>
+          <div style="text-align:right">
+            <div class="pb-lbl">Расчётная цена BSKUSD</div>
+            <div class="pb-val" id="pb-unit">—</div>
+          </div>
+        </div>
+        <div class="pb-grid" id="pb-prices"></div>
+        <div class="note" id="pb-note"></div>
+      </div>
     </div>
 
     <div class="card" id="card-pending" style="display:none;border-color:var(--amber)">
@@ -230,7 +265,7 @@ body{background:var(--bg0);color:var(--txt);font-family:var(--font);min-height:1
 
     <div id="pnl-swap">
       <div class="token-input"><div class="ti-label">Отдаёте</div>
-        <div class="ti-row"><input class="ti-amt" id="sw-amt" type="number" placeholder="0.0" oninput="dq('sw')" min="0"/>
+        <div class="ti-row"><button class="btn-max" onclick="maxSwap()">макс</button><input class="ti-amt" id="sw-amt" type="number" placeholder="0.0" oninput="dq('sw')" min="0"/>
         <select class="ti-select" id="sw-from" onchange="dq('sw')"></select></div></div>
       <div class="arrow-btn"><button onclick="flipSwap()">⇅</button></div>
       <div class="token-input"><div class="ti-label">Получите</div>
@@ -248,7 +283,7 @@ body{background:var(--bg0);color:var(--txt);font-family:var(--font);min-height:1
 
     <div id="pnl-mint" style="display:none">
       <div class="token-input"><div class="ti-label">Вносите</div>
-        <div class="ti-row"><input class="ti-amt" id="mt-amt" type="number" placeholder="0.0" oninput="dq('mt')" min="0"/>
+        <div class="ti-row"><button class="btn-max" onclick="maxMint()">макс</button><input class="ti-amt" id="mt-amt" type="number" placeholder="0.0" oninput="dq('mt')" min="0"/>
         <select class="ti-select" id="mt-tok" onchange="dq('mt')"></select></div></div>
       <div class="quote-box"><div class="qb-label">Получите</div>
         <div class="qb-val" id="mt-quote">—</div><div class="qb-sub" id="mt-sub"></div></div>
@@ -261,7 +296,7 @@ body{background:var(--bg0);color:var(--txt);font-family:var(--font);min-height:1
 
     <div id="pnl-burn" style="display:none">
       <div class="token-input"><div class="ti-label">Сжигаете</div>
-        <div class="ti-row"><input class="ti-amt" id="bn-amt" type="number" placeholder="0.0" oninput="dq('bn')" min="0"/>
+        <div class="ti-row"><button class="btn-max" onclick="maxBurn()">макс</button><input class="ti-amt" id="bn-amt" type="number" placeholder="0.0" oninput="dq('bn')" min="0"/>
         <div class="ti-tag">BSKUSD</div></div></div>
       <div class="divider">в какой токен</div>
       <div class="burn-all" id="bn-all"></div>
@@ -287,7 +322,7 @@ body{background:var(--bg0);color:var(--txt);font-family:var(--font);min-height:1
 
       <div class="divider">вывести корзиной</div>
       <div class="token-input"><div class="ti-label">Сжигаете</div>
-        <div class="ti-row"><input class="ti-amt" id="pb-bsk" type="number" placeholder="0.0" oninput="dq('pb')" min="0"/>
+        <div class="ti-row"><button class="btn-max" onclick="maxPropBurn()">макс</button><input class="ti-amt" id="pb-bsk" type="number" placeholder="0.0" oninput="dq('pb')" min="0"/>
         <div class="ti-tag">BSKUSD</div></div></div>
       <div id="pb-amounts" class="burn-all"></div>
       <div class="qb-sub" id="pb-sub" style="margin:6px 0"></div>
@@ -317,14 +352,14 @@ body{background:var(--bg0);color:var(--txt);font-family:var(--font);min-height:1
         </div>
         <div class="divider">застейкать</div>
         <div class="token-input"><div class="ti-label">Отдаёте</div>
-          <div class="ti-row"><input class="ti-amt" id="sk-in" type="number" placeholder="0.0" oninput="dq('sk')" min="0"/>
+          <div class="ti-row"><button class="btn-max" onclick="maxStake()">макс</button><input class="ti-amt" id="sk-in" type="number" placeholder="0.0" oninput="dq('sk')" min="0"/>
           <div class="ti-tag">BSKUSD</div></div></div>
         <div class="quote-box"><div class="qb-label">Получите</div>
           <div class="qb-val" id="sk-quote">—</div><div class="qb-sub" id="sk-sub"></div></div>
         <button class="btn-action" id="btn-stake" onclick="doStake()" disabled>Застейкать</button>
         <div class="divider">забрать</div>
         <div class="token-input"><div class="ti-label">Отдаёте</div>
-          <div class="ti-row"><input class="ti-amt" id="sk-out" type="number" placeholder="0.0" oninput="dq('un')" min="0"/>
+          <div class="ti-row"><button class="btn-max" onclick="maxUnstake()">макс</button><input class="ti-amt" id="sk-out" type="number" placeholder="0.0" oninput="dq('un')" min="0"/>
           <div class="ti-tag">wsUSD</div></div></div>
         <div class="quote-box"><div class="qb-label">Получите</div>
           <div class="qb-val" id="un-quote">—</div><div class="qb-sub" id="un-sub"></div></div>
@@ -591,9 +626,24 @@ function renderHero(s, isStale){
   const capPct = s.cap/100
   document.getElementById('stack').innerHTML = s.xp.map((x,i)=>{
     const pct = s.totalN>0 ? x/s.totalN*100 : 0
+    // подпись внутри сегмента только если он достаточно широк, иначе
+    // текст обрежется и станет мусором: сумма — во всплывающей подсказке
+    // и всегда в легенде под шкалой
+    const lbl = pct>16 ? `${s.names[i]} ${num(x)}` : (pct>8 ? s.names[i] : '')
     return `<div class="seg${s.paused[i]?' paused':''}${i===selSlot?' active':''}"
       style="width:${pct}%;background:${BARS[i]}" onclick="selectSlot(${i})"
-      title="${s.names[i]} · ${pct.toFixed(1)}%"><span class="seg-lbl">${pct>9?s.names[i]:''}</span></div>`
+      title="${s.names[i]} · ${num(x)} · ${pct.toFixed(1)}%"><span class="seg-lbl">${lbl}</span></div>`
+  }).join('')
+
+  document.getElementById('legend').innerHTML = s.xp.map((x,i)=>{
+    const pct = s.totalN>0 ? x/s.totalN*100 : 0
+    const usd = prices[s.names[i]]
+    return `<div class="lg" style="border-left-color:${BARS[i]}" onclick="selectSlot(${i})">
+      <div class="lg-top"><span class="lg-name">${s.names[i]}${s.paused[i]?'<span class="paused-tag">пауза</span>':''}</span>
+        <span class="lg-share" style="${pct>s.cap/100?'color:var(--red)':''}">${pct.toFixed(1)}%</span></div>
+      <div class="lg-amt">${num(x)}</div>
+      <div class="lg-usd">${usd?('≈ $'+num(x*usd)):'&nbsp;'}</div>
+    </div>`
   }).join('')
   document.getElementById('stack-axis').innerHTML =
     `<div class="cap-mark" style="left:${Math.min(capPct,97)}%">потолок ${capPct}%</div>`
@@ -708,11 +758,13 @@ async function loadBalances(){
     const out={tokens:[],bsk:'—'}
     for(let i=0;i<N;i++){
       const b=await new ethers.Contract(TKN[i],ERC20_ABI,rpc).balanceOf(userAddr)
+      rawBal['t'+i]=b
       const t=fmt(b,DEC[i],DEC[i]===18?4:2)+' '+NAMES[i]
       out.tokens.push(t)
       const e=document.getElementById('bal-'+i); if(e){ e.textContent=t; e.classList.remove('stale') }
     }
     const bsk=await p.balanceOf(userAddr)
+    rawBal['bsk']=bsk
     out.bsk=fmt(bsk,18,4)+' BSKUSD'
     paintBal(out,false)
     document.getElementById('bal-age').textContent=''
@@ -784,7 +836,94 @@ async function loadLimits(){
 async function loadAll(){
   await loadStats()
   await Promise.all([loadBalances(),loadFees(),loadPending(),loadLimits()])
+  renderPrices()
   if(isAdmin) await loadAdmin()
+}
+
+// ---------- кнопки «макс» ----------
+// Баланс уже прочитан для карточки — берём оттуда, чтобы не дёргать сеть
+// на каждый клик.
+let rawBal = {}
+
+function setMax(id, key, dec, tag){
+  const b = rawBal[key]
+  if (b === undefined){ setStatus('Баланс ещё не загружен','error'); return }
+  document.getElementById(id).value = ethers.utils.formatUnits(b, dec)
+  dq(tag)
+}
+function maxSwap(){ setMax('sw-amt','t'+document.getElementById('sw-from').value, DEC[+document.getElementById('sw-from').value],'sw') }
+function maxMint(){ setMax('mt-amt','t'+document.getElementById('mt-tok').value, DEC[+document.getElementById('mt-tok').value],'mt') }
+function maxBurn(){ setMax('bn-amt','bsk',18,'bn') }
+function maxPropBurn(){ setMax('pb-bsk','bsk',18,'pb') }
+function maxStake(){ setMax('sk-in','bsk',18,'sk') }
+function maxUnstake(){ setMax('sk-out','ws',18,'un') }
+
+// ---------- внешние цены ----------
+// Пул НЕ ЗНАЕТ цен: оракула в нём нет по построению, все активы всегда
+// считаются равными доллару. Именно поэтому кривая не сопротивляется
+// депегу — контракт не видит, что актив стоит 0.60.
+//
+// Интерфейс видеть может, и это ровно то предупреждение, которое
+// контракт дать не в состоянии. Но показывать цену надо так, чтобы никто
+// не решил, будто пул на неё опирается.
+let prices = {}
+
+const CG_IDS = {
+  USDT:'tether', USDC:'usd-coin', DAI:'dai', PYUSD:'paypal-usd',
+  FRAX:'frax', TUSD:'true-usd', USDP:'paxos-standard', LUSD:'liquity-usd',
+  GUSD:'gemini-dollar', USDE:'ethena-usde', USDS:'usds'
+}
+
+async function loadPrices(){
+  const box=document.getElementById('price-box')
+  const ids=[...new Set(NAMES.map(n=>CG_IDS[n.toUpperCase()]).filter(Boolean))]
+  if(!ids.length){ box.classList.remove('show'); return }
+  try{
+    const r=await fetch('https://api.coingecko.com/api/v3/simple/price?ids='+ids.join(',')+'&vs_currencies=usd')
+    if(!r.ok) throw new Error('http '+r.status)
+    const d=await r.json()
+    prices={}
+    NAMES.forEach(n=>{
+      const id=CG_IDS[n.toUpperCase()]
+      if(id&&d[id]&&d[id].usd) prices[n]=d[id].usd
+    })
+    renderPrices()
+    if(snap) renderHero(snap,false)
+  }catch(e){
+    // сеть недоступна или лимит запросов — блок просто не показываем,
+    // остальная страница работает без него
+    box.classList.remove('show')
+    console.warn('loadPrices', e)
+  }
+}
+
+function renderPrices(){
+  const box=document.getElementById('price-box')
+  if(!snap || !Object.keys(prices).length){ box.classList.remove('show'); return }
+  let known=0, valueUsd=0
+  snap.names.forEach((n,i)=>{ const p=prices[n]; if(p){ known++; valueUsd+=snap.xp[i]*p } })
+  if(!known){ box.classList.remove('show'); return }
+  box.classList.add('show')
+
+  const covered = known===snap.n
+  const unit = snap.supplyN>0 ? valueUsd/snap.supplyN : 0
+  document.getElementById('pb-value').textContent='$'+num(valueUsd)
+  const u=document.getElementById('pb-unit')
+  u.textContent='$'+unit.toFixed(4)
+  u.style.color = unit<0.99 ? 'var(--red)' : (unit>1.005 ? 'var(--amber)' : 'var(--green)')
+
+  document.getElementById('pb-prices').innerHTML=snap.names.map((n,i)=>{
+    const p=prices[n]
+    const off = p && Math.abs(p-1)>0.01
+    return `<div class="pb-cell${off?' off':''}">${n}<b>${p?('$'+p.toFixed(4)):'нет цены'}</b></div>`
+  }).join('')
+
+  const depegged=snap.names.filter(n=>prices[n]&&Math.abs(prices[n]-1)>0.01)
+  document.getElementById('pb-note').innerHTML =
+    (depegged.length ? `<span style="color:var(--red)"><b>Отклонение от доллара: ${depegged.join(', ')}.</b> Пул этого не видит и продолжает считать актив за доллар — арбитраж будет заливать подешевевший актив, пока не упрётся в потолок доли.</span><br/>` : '')
+    + `Цены получены снаружи, из CoinGecko. <b>Контракт их не использует</b> и не может: оракула в нём нет, все активы всегда считаются равными доллару.`
+    + (covered ? '' : ' Часть активов без цены — оценка неполная.')
+    + ' На тестовой сети токены моковые, и цена по символу к ним отношения не имеет.'
 }
 
 // ---------- подключение ----------
@@ -1016,6 +1155,7 @@ async function loadStake(){
       : '1 wsUSD = 1.000000'
     if(userAddr){
       const mine=await wsusd.balanceOf(userAddr)
+      rawBal['ws']=mine
       document.getElementById('sk-mine').textContent=fmt(mine,18,4)
       const v = mine.gt(0) ? await wsusd.convertToAssets(mine) : ethers.BigNumber.from(0)
       document.getElementById('sk-value').textContent=fmt(v,18,4)+' BSKUSD'
@@ -1143,12 +1283,23 @@ async function admCall(fn,args){
     await loadBasket()
     await loadStats()
     await Promise.all([loadFees(),loadPending(),loadLimits(),loadStake()])
+    loadPrices()
   }catch(e){
     setStatus('Не удалось прочитать пул. Проверьте адрес контракта и сеть.','error')
     console.error(e)
   }
+
+  // Состав меняется от чужих сделок. Без этого страница показывала бы
+  // снимок момента загрузки, и котировка расходилась бы с реальностью.
+  // Обновляем не чаще раза в 12 секунд, чтобы не молотить RPC.
+  let last = 0
+  rpc.on('block', async ()=>{
+    const now = Date.now()
+    if (now - last < 12000) return
+    last = now
+    try{ await loadStats(); await loadLimits(); renderPrices() }catch(e){}
+  })
 })()
 </script>
 </body>
 </html>
-
