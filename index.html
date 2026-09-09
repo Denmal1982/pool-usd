@@ -95,6 +95,10 @@ body{background:var(--bg0);color:var(--txt);font-family:var(--font);min-height:1
 .bal-info{flex:1;min-width:0}
 .bal-name{font-size:12px;color:var(--txt3)}
 .bal-val{font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fee3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.f3{background:var(--bg2);border:1px solid var(--border);border-radius:11px;padding:10px 12px;text-align:center}
+.f3-k{font-size:11px;color:var(--txt3);margin-bottom:3px}
+.f3-v{font-size:17px;font-weight:800}
 .fee-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:12px}
 .fee-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .fee-name{color:var(--txt2);flex:1}
@@ -245,6 +249,8 @@ body{background:var(--bg0);color:var(--txt);font-family:var(--font);min-height:1
         <div class="card-title">Куда идёт комиссия</div><span class="chev" id="chev-fee">▾</span>
       </div>
       <div class="cbody" id="body-fee">
+        <div id="fee-rates"></div>
+        <div class="divider">накоплено</div>
         <div class="fee-row"><div class="fee-dot" style="background:var(--amber)"></div><div class="fee-name">Казна</div><div class="fee-val" id="fd-treasury">—</div></div>
         <div class="fee-row"><div class="fee-dot" style="background:var(--purple)"></div><div class="fee-name">Стейкеры wsUSD</div><div class="fee-val" id="fd-wsusd">—</div></div>
         <div class="note" id="fd-note"></div>
@@ -416,7 +422,22 @@ body{background:var(--bg0);color:var(--txt);font-family:var(--font);min-height:1
         <button class="btn-sm danger" onclick="admCall('cancel_a_change',[])">Отменить</button>
       </div>
       <div class="note">Шаг не более чем вдвое, не чаще раза в неделю. Уведомление 24 часа, окно 48. Применение требует сбалансированного пула. Заявка аннулируется при добавлении актива.</div>
-      <div class="divider">раздел комиссии</div>
+      <div class="divider">комиссии: вход, обмен, выход</div>
+      <div id="adm-fees-now"></div>
+      <div id="adm-fees-pending"></div>
+      <div class="g3">
+        <input class="adm-inp" id="adm-fee-mint" placeholder="вход"/>
+        <input class="adm-inp" id="adm-fee-swap" placeholder="обмен"/>
+        <input class="adm-inp" id="adm-fee-burn" placeholder="выход"/>
+      </div>
+      <div class="g3">
+        <button class="btn-sm" onclick="admCall('schedule_fees',[val('adm-fee-mint'),val('adm-fee-swap'),val('adm-fee-burn')])">Объявить</button>
+        <button class="btn-sm" onclick="admCall('apply_fees',[])">Применить</button>
+        <button class="btn-sm danger" onclick="admCall('cancel_fees',[])">Отменить</button>
+      </div>
+      <div class="note" id="adm-fee-note"></div>
+
+      <div class="divider">раздел комиссии между казной и стейкерами</div>
       <div id="adm-split-pending"></div>
       <input class="adm-inp" id="adm-wsusd" placeholder="0x… адрес вейла wsUSD"/>
       <input class="adm-inp" id="adm-tbp" placeholder="доля КАЗНЫ в б.п., 5000 = поровну"/>
@@ -447,7 +468,7 @@ body{background:var(--bg0);color:var(--txt);font-family:var(--font);min-height:1
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
 <script>
-const POOL_ADDR = "0x33bb77F98737A7A9f56D5DeD2952fE8F0Ac29fea"
+const POOL_ADDR = "0xc79978CEE433babd0Bb19B4469c5508888897ED7"
 const CHAIN_ID  = 11155111
 const RPC_URL   = "https://ethereum-sepolia.publicnode.com"
 const EXPLORER  = "https://sepolia.etherscan.io"
@@ -455,7 +476,6 @@ const MAX_COINS = 5
 const BARS = ["#7c6ff7","#1fd18a","#5b8af7","#f5a623","#f06060"]
 
 const POOL_ABI = [
- "function VERSION() view returns (string)",
  "function totalSupply() view returns (uint256)",
  "function balanceOf(address) view returns (uint256)",
  "function n_coins() view returns (uint256)",
@@ -472,7 +492,15 @@ const POOL_ABI = [
  "function treasury() view returns (address)",
  "function wsUSD() view returns (address)",
  "function treasury_bp() view returns (uint256)",
- "function FEE_BP() view returns (uint256)",
+ "function FEE_MAX_BP() view returns (uint256)",
+ "function FEE_DELAY() view returns (uint256)",
+ "function FEE_WINDOW() view returns (uint256)",
+ "function fees() view returns (uint256,uint256,uint256)",
+ "function pending_fees() view returns (uint256,uint256,uint256,uint256)",
+ "function pending_fee_eta() view returns (uint256)",
+ "function schedule_fees(uint256,uint256,uint256)",
+ "function apply_fees()",
+ "function cancel_fees()",
  "function MIN_DELIVERED_BP() view returns (uint256)",
  "function get_state() view returns (uint256[5],uint256,uint256,uint256,uint256,uint256)",
  "function quote_mint_net(uint256,uint256) view returns (uint256)",
@@ -536,6 +564,22 @@ let slip={sw:0.1,mt:0.1,bn:0.1}
 let burnSel=0, timers={}, forfeit=[false,false,false,false,false]
 let N=0, TKN=[], NAMES=[], DEC=[]
 let snap=null, selSlot=-1
+// Комиссии больше не константа: три значения читаются с контракта и
+// могут измениться по таймлоку. Держим последнее прочитанное, чтобы
+// подписи под котировками не врали.
+let FEE = {mint:null, swap:null, burn:null}
+
+// Сроки таймлока комиссий читаются с контракта, а не пишутся здесь: в
+// тестовой сети они укорочены до часа, в мейннете должны быть 7 и 14 дней.
+let FEE_TIMES = {delay:0, window:0}
+
+function fmtDur(sec){
+  if(!sec) return '—'
+  if(sec >= 86400) return Math.round(sec/86400)+' д'
+  if(sec >= 3600)  return Math.round(sec/3600)+' ч'
+  return Math.round(sec/60)+' мин'
+}
+const bp = v => v===null ? '—' : (v/100).toFixed(2)+'%'
 
 const rpc = new ethers.providers.JsonRpcProvider(RPC_URL)
 const poolRO = new ethers.Contract(POOL_ADDR, POOL_ABI, rpc)
@@ -772,6 +816,32 @@ async function loadBalances(){
   }catch(e){ console.error('loadBalances',e) }
 }
 
+async function loadFeeRates(){
+  const p=pool||poolRO
+  try{
+    const [m,sw,b]=await p.fees()
+    FEE={mint:m.toNumber(), swap:sw.toNumber(), burn:b.toNumber()}
+    renderFeeRates()
+  }catch(e){ console.error('loadFeeRates',e) }
+}
+
+function renderFeeRates(){
+  const el=document.getElementById('fee-rates')
+  if(!el||FEE.mint===null) return
+  const sum=FEE.mint+FEE.burn
+  el.innerHTML=`
+    <div class="fee3">
+      <div class="f3"><div class="f3-k">вход</div><div class="f3-v">${bp(FEE.mint)}</div></div>
+      <div class="f3"><div class="f3-k">обмен</div><div class="f3-v">${bp(FEE.swap)}</div></div>
+      <div class="f3"><div class="f3-k">выход</div><div class="f3-v">${bp(FEE.burn)}</div></div>
+    </div>` +
+    (FEE.swap>sum
+      ? `<div class="warn">Обмен дороже, чем вход плюс выход (${bp(FEE.swap)} против ${bp(sum)}).
+         Тот же результат дешевле получить в два шага: внести в один слот и вывести из другого.
+         Разница окупает лишний газ примерно от 3 000 $ оборота.</div>`
+      : '')
+}
+
 async function loadFees(){
   try{
     const p=pool||poolRO, zero=ethers.constants.AddressZero
@@ -780,7 +850,7 @@ async function loadFees(){
     if(w!==zero){
       document.getElementById('fd-wsusd').textContent=fmt(await p.balanceOf(w),18,2)+' BSKUSD'
       document.getElementById('fd-note').textContent=
-        `Комиссия 0.04% со всех операций, делится ${tbp.toNumber()/100}% казне и ${(10000-tbp.toNumber())/100}% стейкерам. Казна ${short(t)}, вейл ${short(w)}.`
+        `Делится ${tbp.toNumber()/100}% казне и ${(10000-tbp.toNumber())/100}% стейкерам. Казна ${short(t)}, вейл ${short(w)}.`
     }else{
       document.getElementById('fd-wsusd').textContent='вейл не задан'
       document.getElementById('fd-note').textContent=`Пока вейл не задан, вся комиссия идёт в казну ${short(t)}.`
@@ -799,6 +869,11 @@ async function loadPending(){
     if(!pt.eq(0)){ const E=eta(pt)
       items.push(`<b>В корзину добавят актив</b> ${short(pta)}.<br/>Потолок доли сузится до 40%, параметр A станет ${na.toString()} — проскальзывание вырастет примерно вдвое.<br/>${E.when} — ${E.left}`) }
     if(!pa.eq(0)){ const E=eta(pa); items.push(`<b>Параметр кривой станет ${pav.toString()}</b>.<br/>${E.when} — ${E.left}`) }
+    try{
+      const [qm,qs,qb,qe]=await p.pending_fees()
+      if(!qe.eq(0)){ const E=eta(qe)
+        items.push(`<b>Комиссии станут ${bp(qm.toNumber())} вход, ${bp(qs.toNumber())} обмен, ${bp(qb.toNumber())} выход</b>.<br/>${E.when} — ${E.left}`) }
+    }catch(e){}
     if(!ps.eq(0)){ const E=eta(ps); items.push(`<b>Доля казны станет ${psv.toNumber()/100}%</b>.<br/>${E.when} — ${E.left}`) }
     if(!pw.eq(0)){ const E=eta(pw); items.push(`<b>Получатель доходной части сменится</b> на ${short(pwa)}.<br/>${E.when} — ${E.left}`) }
     for(let i=0;i<N;i++){
@@ -817,12 +892,11 @@ async function loadPending(){
 async function loadLimits(){
   try{
     const p=pool||poolRO
-    const [fee,minDel]=await Promise.all([p.FEE_BP(),p.MIN_DELIVERED_BP()])
+    const minDel=await p.MIN_DELIVERED_BP()
     if(!snap) return
     const capF=snap.cap/10000
     const maxIn=snap.xp.map(x=>{ const m=(capF*snap.totalN-x)/(1-capF); return m>0?m:0 })
     const rows=[
-      ['комиссия',(fee.toNumber()/100)+'% со всех операций'],
       ['пол каждого слота',(snap.dN/snap.n*0.005).toFixed(2)+' — ниже опустить нельзя'],
       ['минимум вывода корзиной','доставить не меньше '+(minDel.toNumber()/100)+'% причитающегося'],
       ['максимум одностороннего входа', maxIn.map((m,i)=>`${snap.names[i]} ${num(m)}`).join(' · ')],
@@ -835,7 +909,7 @@ async function loadLimits(){
 
 async function loadAll(){
   await loadStats()
-  await Promise.all([loadBalances(),loadFees(),loadPending(),loadLimits()])
+  await Promise.all([loadBalances(),loadFeeRates(),loadFees(),loadPending(),loadLimits()])
   renderPrices()
   if(isAdmin) await loadAdmin()
 }
@@ -991,7 +1065,10 @@ async function qSwap(){
     out.value=fmt(dy,DEC[j],DEC[j]===18?6:4)
     const r=parseFloat(ethers.utils.formatUnits(dy,DEC[j]))/parseFloat(v)
     document.getElementById('sw-rate').textContent=`1 ${NAMES[i]} ≈ ${r.toFixed(6)} ${NAMES[j]}`
-    document.getElementById('sw-sub').textContent=`Комиссия учтена. Минимум при допуске ${slip.sw}%: ${fmt(minOut(dy,slip.sw),DEC[j],4)} ${NAMES[j]}`
+    let sub=`Комиссия обмена ${bp(FEE.swap)} уже учтена. Минимум при допуске ${slip.sw}%: ${fmt(minOut(dy,slip.sw),DEC[j],4)} ${NAMES[j]}`
+    if(FEE.swap!==null && FEE.swap > FEE.mint+FEE.burn)
+      sub+=` · дешевле в два шага: внести ${NAMES[i]} (${bp(FEE.mint)}) и вывести ${NAMES[j]} (${bp(FEE.burn)})`
+    document.getElementById('sw-sub').textContent=sub
     box.style.display='block'
   }catch(e){
     out.value=''; box.style.display='block'
@@ -1008,7 +1085,8 @@ async function qMint(){
     const o=await (pool||poolRO).quote_mint_net(i,raw)
     q.textContent=fmt(o,18,6)+' BSKUSD'
     const loss=(parseFloat(v)-parseFloat(ethers.utils.formatUnits(o,18)))/parseFloat(v)*100
-    document.getElementById('mt-sub').textContent=`Потеря ${loss.toFixed(4)}% — комиссия плюс проскальзывание от перекоса пула.`
+    document.getElementById('mt-sub').textContent=
+      `Потеря ${loss.toFixed(4)}%: комиссия входа ${bp(FEE.mint)} плюс проскальзывание от перекоса пула.`
   }catch(e){ q.textContent='Отклонено'
     document.getElementById('mt-sub').textContent='Слот приостановлен либо операция упёрлась в потолок доли.' }
 }
@@ -1028,7 +1106,8 @@ async function qBurn(){
       document.getElementById('bn-sub').textContent='Выход в этот актив упирается в потолок доли или пол слота. Выберите другой токен или выведите корзиной.'
       return }
     q.textContent=fmt(sel,DEC[burnSel],DEC[burnSel]===18?6:4)+' '+NAMES[burnSel]
-    document.getElementById('bn-sub').textContent=`Минимум при допуске ${slip.bn}%: ${fmt(minOut(sel,slip.bn),DEC[burnSel],4)} ${NAMES[burnSel]}`
+    document.getElementById('bn-sub').textContent=
+      `Комиссия выхода ${bp(FEE.burn)}. Минимум при допуске ${slip.bn}%: ${fmt(minOut(sel,slip.bn),DEC[burnSel],4)} ${NAMES[burnSel]}`
   }catch(e){ q.textContent='Отклонено' }
 }
 function selBurn(i){ burnSel=i
@@ -1041,7 +1120,8 @@ async function qPropMint(){
     const raw=parseAmt(v,18); if(!raw) return
     const [net,am]=await (pool||poolRO).quote_mint_proportional(raw)
     q.textContent=fmt(net,18,6)+' BSKUSD'
-    document.getElementById('pm-sub').textContent='Проскальзывания нет, объём не ограничен потолком.'
+    document.getElementById('pm-sub').textContent=
+      `Комиссия входа ${bp(FEE.mint)}. Проскальзывания нет, объём не ограничен потолком.`
     a.innerHTML=am.slice(0,N).map((x,i)=>`<div class="ba-item"><div class="ba-name">внести ${NAMES[i]}</div>
       <div class="ba-val">${fmt(x,DEC[i],DEC[i]===18?6:4)}</div></div>`).join('')
   }catch(e){ q.textContent='Отклонено'; a.innerHTML='' }
@@ -1055,7 +1135,8 @@ async function qPropBurn(){
     a.innerHTML=am.slice(0,N).map((x,i)=>`<div class="ba-item" style="${forfeit[i]?'opacity:.4':''}">
       <div class="ba-name">${NAMES[i]}${forfeit[i]?' — отказ':''}</div>
       <div class="ba-val">${forfeit[i]?'0':fmt(x,DEC[i],DEC[i]===18?6:4)}</div></div>`).join('')
-    document.getElementById('pb-sub').textContent='Пропорции текущие, а не равные: чего в пуле больше, того и получите больше.'
+    document.getElementById('pb-sub').textContent=
+      `Комиссия выхода ${bp(FEE.burn)}. Пропорции текущие, а не равные: чего в пуле больше, того и получите больше.`
   }catch(e){ a.innerHTML=''
     document.getElementById('pb-sub').textContent='Сумма слишком мала: доли по слотам с малым числом знаков усекаются в ноль.' }
 }
@@ -1221,10 +1302,13 @@ async function loadAdmin(){
   if(!isAdmin) return
   const p=pool||poolRO, zero=ethers.constants.AddressZero
   try{
-    const [ver,adm,grd,tre,ws,init,na,tbp,nc]=await Promise.all([
-      p.VERSION(),p.admin(),p.guardian(),p.treasury(),p.wsUSD(),
+    // VERSION удалён из контракта в v5.3.0: константа занимала место в
+    // байткоде, а доверять строке, которую возвращает проверяемый же
+    // контракт, смысла нет. Идентификация — по хешу кода.
+    const [adm,grd,tre,ws,init,na,tbp,nc]=await Promise.all([
+      p.admin(),p.guardian(),p.treasury(),p.wsUSD(),
       p.initialized(),p.next_a_preview(),p.treasury_bp(),p.n_coins()])
-    const rows=[['версия',ver],['активных слотов',nc.toString()+' из '+MAX_COINS],
+    const rows=[['активных слотов',nc.toString()+' из '+MAX_COINS],
       ['админ',short(adm)],['guardian',grd===zero?'не назначен':short(grd)],
       ['казна',short(tre)],['вейл',ws===zero?'не задан':short(ws)],
       ['доля казны',(tbp.toNumber()/100)+'%'],['пул запущен',init?'да':'НЕТ'],
@@ -1240,6 +1324,32 @@ async function loadAdmin(){
     document.getElementById('adm-pause').innerHTML=Array.from({length:N},(_,i)=>
       `<button class="btn-sm ${paused[i]?'danger':''}" onclick="admCall('${paused[i]?'unpause_token':'pause_token'}',[${i}])">
         ${NAMES[i]||('слот '+i)}: ${paused[i]?'снять':'пауза'}</button>`).join('')
+
+    // комиссии
+    const [fm,fs,fb]=await p.fees()
+    const cap=await p.FEE_MAX_BP()
+    // Сроки читаем с контракта, а не пишем в интерфейсе: в тестовой сети
+    // они укорочены до часа, в мейннете должны быть 7 и 14 дней.
+    try{
+      FEE_TIMES.delay  = (await p.FEE_DELAY()).toNumber()
+      FEE_TIMES.window = (await p.FEE_WINDOW()).toNumber()
+    }catch(e){}
+    document.getElementById('adm-fees-now').innerHTML=
+      `<div class="fee3">
+        <div class="f3"><div class="f3-k">вход</div><div class="f3-v">${fm}</div></div>
+        <div class="f3"><div class="f3-k">обмен</div><div class="f3-v">${fs}</div></div>
+        <div class="f3"><div class="f3-k">выход</div><div class="f3-v">${fb}</div></div>
+      </div>`
+    const [pm,psw,pb2,peta]=await p.pending_fees()
+    document.getElementById('adm-fees-pending').innerHTML=
+      pbox(eta(peta), peta.eq(0)?null:`станет ${pm} / ${psw} / ${pb2} (вход / обмен / выход)`)
+    const sum=fm.toNumber()+fb.toNumber()
+    document.getElementById('adm-fee-note').innerHTML =
+      `Значения в базисных пунктах, потолок ${cap}. Один пункт — 0.01%. Все три меняются вместе, любым шагом.`
+      + ` Уведомление ${fmtDur(FEE_TIMES.delay)}, окно применения ${fmtDur(FEE_TIMES.window)}.`
+      + `<br/>Ориентир, который контракт НЕ проверяет: <b>обмен ≤ вход + выход</b>. `
+      + `Иначе тот же обмен дешевле сделать в два шага, и платить за него станут только те, кто не знает про обход.`
+      + (fs.toNumber()>sum ? `<br/><span style="color:var(--red)">Сейчас ориентир нарушен: обмен ${fs} против ${sum}.</span>` : '')
 
     const [pt,pta,ptm]=await Promise.all([p.pending_token_eta(),p.pending_token(),p.pending_token_amt()])
     document.getElementById('adm-add-pending').innerHTML=pbox(eta(pt),pt.eq(0)?null:`Токен ${short(pta)}, сумма ${ptm.toString()}`)
@@ -1282,7 +1392,7 @@ async function admCall(fn,args){
   try{
     await loadBasket()
     await loadStats()
-    await Promise.all([loadFees(),loadPending(),loadLimits(),loadStake()])
+    await Promise.all([loadFeeRates(),loadFees(),loadPending(),loadLimits(),loadStake()])
     loadPrices()
   }catch(e){
     setStatus('Не удалось прочитать пул. Проверьте адрес контракта и сеть.','error')
