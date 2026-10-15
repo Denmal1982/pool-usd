@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BSKUSD — App</title>
+<meta name="description" content="Swap, deposit and withdraw BSKUSD — one dollar backed by a basket of stablecoins.">
+<meta property="og:title" content="BSKUSD App">
+<meta property="og:image" content="assets/img/previews/og-1200x630.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="assets/img/bskusd.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/img/icon-500.png">
+<link rel="stylesheet" href="assets/css/site.css">
+<script src="assets/js/config.js"></script>
+<script src="assets/js/common.js"></script>
+</head>
+<body>
+
+<header class="site-hdr">
+<div class="in">
+<a class="brand" href="index.html"><img src="assets/img/bskusd.svg" alt="" width="32" height="32"><span>BSKUSD</span></a>
+<nav class="site-nav" aria-label="Site">
+<a href="index.html"><span data-l="en">Overview</span><span data-l="ru">Обзор</span></a>
+<a href="docs.html"><span data-l="en">Docs</span><span data-l="ru">Документация</span></a>
+<a href="app.html" aria-current="page"><span data-l="en">App</span><span data-l="ru">Приложение</span></a>
+</nav>
+<div class="hdr-right">
+<span class="pill-net" data-net-name>Sepolia</span>
+<span class="seg" role="group" aria-label="Language"><button type="button" data-set-lang="en">EN</button><button type="button" data-set-lang="ru">RU</button></span>
+<span class="seg" role="group" aria-label="Theme"><button type="button" data-set-theme="dark"><span data-l="en">Dark</span><span data-l="ru">Тёмная</span></button><button type="button" data-set-theme="light"><span data-l="en">Light</span><span data-l="ru">Светлая</span></button></span>
+<button type="button" class="btn btn-secondary btn-wallet" id="btn-wallet" data-i18n="connect">Connect Wallet</button>
+</div>
+</div>
+</header>
+
+<main class="app-main" id="main">
+<div class="col-left">
+
+<section class="banner hidden" id="banner-compat">
+<b data-i18n="compatTitle">Contract does not match this page</b>
+<span class="note" id="compat-text"></span>
+</section>
+
+<section class="banner hidden" id="banner-launch">
+<b data-i18n="notLaunchedTitle">Pool not launched yet</b>
+<span class="note" data-i18n="notLaunchedText">Deposits, swaps and withdrawals open after the administrator runs bootstrap().</span>
+</section>
+
+<section class="hero-card" aria-label="Basket">
+<div class="hero-top">
+<div style="display:flex;flex-direction:column;gap:4px">
+<span class="lbl-acc" data-i18n="balanceTotal">Balance Total</span>
+<span class="tvl" id="hero-tvl">—</span>
+</div>
+<div class="metrics">
+<div class="metric"><span class="k" data-i18n="supply">Supply</span><span class="v" id="hero-supply">—</span></div>
+<div class="metric" id="hero-backing-wrap"><span class="k" data-i18n="backing">Backing</span><span class="v" id="hero-backing">—</span></div>
+<div class="metric"><span class="k" data-i18n="shareCap">Share Cap</span><span class="v" id="hero-cap">—</span></div>
+<div class="metric"><span class="k" data-i18n="assets">Assets</span><span class="v" id="hero-n">—</span></div>
+</div>
+</div>
+<div class="stack" id="stack" role="img" aria-label="Basket composition"></div>
+<div class="slots" id="slots"></div>
+</section>
+
+<section class="card" aria-label="My position">
+<div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px">
+<span class="card-title" data-i18n="myPosition">My Position</span>
+<span class="note" id="pos-addr"></span>
+</div>
+<div id="pos-body"><span class="note" data-i18n="connectToSee">Connect a wallet to see your balances.</span></div>
+</section>
+
+<section class="card hidden" id="card-pending">
+<span class="card-title" style="color:var(--warn)" data-i18n="announced">Announced Changes</span>
+<div id="pending-list" style="display:flex;flex-direction:column;gap:6px"></div>
+<span class="note" data-i18n="announcedNote">Every change is announced in advance so anyone who disagrees has time to exit.</span>
+</section>
+
+<section class="card">
+<button type="button" class="acc-head" id="det-head" aria-expanded="false">
+<span style="display:flex;flex-direction:column;gap:2px">
+<span class="card-title" data-i18n="details">Details</span>
+<span class="note" data-i18n="detailsSub">Limits, fees and protocol parameters</span>
+</span>
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+</button>
+<div class="det-grid hidden" id="det-body">
+<div class="det-col"><span class="k" data-i18n="limitsH">LIMITS</span><div id="det-limits"></div></div>
+<div class="det-col"><span class="k" data-i18n="feesH">FEES</span><div id="det-fees"></div></div>
+<div class="det-col"><span class="k" data-i18n="protocolH">PROTOCOL</span><div id="det-proto"></div></div>
+</div>
+</section>
+</div>
+
+<aside class="panel" aria-label="Actions">
+<div class="status" id="status" role="status" aria-live="polite"></div>
+<div class="tabs" role="tablist">
+<button type="button" class="tab" role="tab" data-tab="swap" aria-selected="true" data-i18n="swap">Swap</button>
+<button type="button" class="tab" role="tab" data-tab="deposit" aria-selected="false" data-i18n="deposit">Deposit</button>
+<button type="button" class="tab" role="tab" data-tab="withdraw" aria-selected="false" data-i18n="withdraw">Withdraw</button>
+</div>
+<div class="modes hidden" id="modes">
+<button type="button" data-mode="one" aria-pressed="true" data-i18n="oneToken">One Token</button>
+<button type="button" data-mode="basket" aria-pressed="false" data-i18n="wholeBasket">Whole Basket</button>
+</div>
+
+<!-- swap -->
+<div id="v-swap" style="display:flex;flex-direction:column;gap:8px">
+<div class="field">
+<div class="field-top"><label for="sw-amt" data-i18n="youPay">You Pay</label><span><span id="sw-bal"></span> <button type="button" class="mini" id="sw-max" data-i18n="max">Max</button></span></div>
+<div class="field-row"><input class="amt" id="sw-amt" type="number" inputmode="decimal" min="0" placeholder="0.0"><span class="tok"><img id="sw-from-ic" alt=""><select id="sw-from" aria-label="Token you pay"></select></span></div>
+</div>
+<div class="flip"><button type="button" id="sw-flip" aria-label="Swap direction"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--vio-text)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4v16M8 4L4 8M8 4l4 4"/><path d="M16 20V4M16 20l-4-4M16 20l4-4"/></svg></button></div>
+<div class="field">
+<div class="field-top"><span data-i18n="youReceive">You Receive</span></div>
+<div class="field-row"><input class="amt" id="sw-out" type="text" placeholder="0.0" disabled><span class="tok"><img id="sw-to-ic" alt=""><select id="sw-to" aria-label="Token you receive"></select></span></div>
+</div>
+</div>
+
+<!-- deposit one token -->
+<div id="v-dep-one" class="hidden" style="flex-direction:column;gap:8px">
+<div class="field" id="dp-field">
+<div class="field-top"><label for="dp-amt" data-i18n="youDeposit">You Deposit</label><span><span id="dp-bal"></span> <button type="button" class="mini" id="dp-max" data-i18n="max">Max</button></span></div>
+<div class="field-row"><input class="amt" id="dp-amt" type="number" inputmode="decimal" min="0" placeholder="0.0"><span class="tok"><img id="dp-tok-ic" alt=""><select id="dp-tok" aria-label="Token you deposit"></select></span></div>
+</div>
+<div class="field">
+<div class="field-top"><span data-i18n="youReceive">You Receive</span></div>
+<div class="field-row"><input class="amt" id="dp-out" type="text" placeholder="0.0" disabled><span class="tok"><img src="assets/img/bskusd.svg" alt="">BSKUSD</span></div>
+</div>
+</div>
+
+<!-- deposit basket -->
+<div id="v-dep-bk" class="hidden" style="flex-direction:column;gap:8px">
+<div class="field">
+<div class="field-top"><label for="db-amt" data-i18n="wantReceive">You Want To Receive</label></div>
+<div class="field-row"><input class="amt" id="db-amt" type="number" inputmode="decimal" min="0" placeholder="0.0"><span class="tok"><img src="assets/img/bskusd.svg" alt="">BSKUSD</span></div>
+</div>
+<span class="note" data-i18n="youSendProp">You send, in the pool's current proportion:</span>
+<div class="pick" id="db-list"></div>
+</div>
+
+<!-- withdraw one token -->
+<div id="v-wd-one" class="hidden" style="flex-direction:column;gap:8px">
+<div class="field" id="wo-field">
+<div class="field-top"><label for="wo-amt" data-i18n="youBurn">You Burn</label><span><span id="wo-bal"></span> <button type="button" class="mini" id="wo-max" data-i18n="max">Max</button></span></div>
+<div class="field-row"><input class="amt" id="wo-amt" type="number" inputmode="decimal" min="0" placeholder="0.0"><span class="tok"><img src="assets/img/bskusd.svg" alt="">BSKUSD</span></div>
+</div>
+<span class="note" data-i18n="receiveIn">Receive in</span>
+<div class="pick" id="wo-pick"></div>
+</div>
+
+<!-- withdraw basket -->
+<div id="v-wd-bk" class="hidden" style="flex-direction:column;gap:8px">
+<div class="field" id="wb-field">
+<div class="field-top"><label for="wb-amt" data-i18n="youBurn">You Burn</label><span><span id="wb-bal"></span> <button type="button" class="mini" id="wb-max" data-i18n="max">Max</button></span></div>
+<div class="field-row"><input class="amt" id="wb-amt" type="number" inputmode="decimal" min="0" placeholder="0.0"><span class="tok"><img src="assets/img/bskusd.svg" alt="">BSKUSD</span></div>
+</div>
+<span class="note" data-i18n="receiveAtLeast">You receive at least:</span>
+<div class="pick" id="wb-list"></div>
+</div>
+
+<div class="summary">
+<div class="row"><span class="k" id="sum-k1">—</span><span class="v" id="sum-v1">—</span></div>
+<div class="row"><span class="k" id="sum-k2">—</span><span class="v" id="sum-v2">—</span></div>
+<div class="row"><span class="k" data-i18n="slippage">Slippage</span><span style="display:flex;gap:4px;align-items:center" id="slip"></span></div>
+</div>
+<button type="button" class="btn btn-primary btn-block" id="btn-act">—</button>
+<div class="why" id="why"></div>
+<span class="note" style="text-align:center" data-i18n="stakingSoon">Staking opens once the vault is connected.</span>
+</aside>
+</main>
+
+<div class="overlay hidden" id="dlg-connect">
+<div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dlg-title">
+<div class="dialog-head"><span id="dlg-title" data-i18n="connect">Connect Wallet</span>
+<button type="button" class="icon-btn" id="dlg-close" aria-label="Close"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+<button type="button" class="opt" id="opt-injected">
+<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--acc-text)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M3 8h18M8 21h8"/></svg>
+<span><b data-i18n="browserWallet">Browser Wallet</b><small data-i18n="browserWalletSub">MetaMask, Rabby or any extension</small></span></button>
+<button type="button" class="opt" id="opt-wc">
+<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--vio)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg>
+<span><b>WalletConnect</b><small data-i18n="wcSub">Phone wallet — scan a QR code or open the app</small></span></button>
+<span class="note" style="text-align:center" data-i18n="noKeys">BSKUSD never sees your keys. Every transaction is approved in your wallet.</span>
+</div>
+</div>
+
+<footer class="site-ftr"><div class="in"><span>BSKUSD</span><span><a href="docs.html"><span data-l="en">Docs</span><span data-l="ru">Документация</span></a> · <a href="#" data-explorer-pool="text">…</a></span></div></footer>
+
+<script src="assets/vendor/ethers-5.7.2.umd.min.js"></script>
+<script src="assets/vendor/walletconnect-ethereum-provider-2.17.0.umd.js" defer></script>
+<script src="assets/js/wallet.js"></script>
+<script src="assets/js/pool.js"></script>
+<script src="assets/js/app.js"></script>
+</body>
+</html>

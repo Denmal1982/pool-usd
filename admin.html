@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>BSKUSD — администрирование</title>
+<style>
+  body { font: 14px/1.45 system-ui, -apple-system, Segoe UI, Roboto, sans-serif; max-width: 860px; margin: 0 auto; padding: 16px; color: #111; background: #fff; }
+  h1 { font-size: 20px; margin: 8px 0 4px; }
+  h2 { font-size: 16px; margin: 0 0 8px; }
+  fieldset { border: 1px solid #bbb; margin: 0 0 14px; padding: 10px 12px; }
+  legend { font-weight: 600; padding: 0 4px; }
+  input, select, button { font: inherit; padding: 4px 6px; margin: 2px 4px 2px 0; }
+  input[type=text] { width: 100%; max-width: 420px; box-sizing: border-box; }
+  input.n { width: 110px; }
+  table { border-collapse: collapse; width: 100%; margin: 4px 0 8px; table-layout: fixed; }
+  td, th { border: 1px solid #ddd; padding: 3px 6px; text-align: left; vertical-align: top; overflow-wrap: anywhere; }
+  th { background: #f4f4f4; font-weight: 600; }
+  code, .mono { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12.5px; }
+  .row { margin: 4px 0; }
+  .hint { color: #666; font-size: 12.5px; }
+  #log { white-space: pre-wrap; background: #f6f6f6; border: 1px solid #ddd; padding: 8px; max-height: 220px; overflow: auto; font-size: 12.5px; }
+  .ok { color: #070; } .err { color: #b00; } .warn { color: #a60; }
+  button { max-width: 100%; }
+  fieldset { min-width: 0; }
+  .top { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; border-bottom: 1px solid #ccc; padding-bottom: 8px; margin-bottom: 12px; }
+</style>
+<script src="assets/js/config.js"></script>
+</head>
+<body>
+<div class="top">
+  <div>
+    <h1>BSKUSD — администрирование</h1>
+    <div class="hint">Пул: <a id="pool-link" class="mono" target="_blank" rel="noopener"></a> · сеть <span id="net"></span> · <a href="index.html">на сайт</a></div>
+  </div>
+  <div>
+    <button id="c-inj">Браузерный кошелёк</button>
+    <button id="c-wc">WalletConnect</button>
+    <button id="c-off" hidden>Отключить</button>
+    <div class="hint">Кошелёк: <span id="me" class="mono">не подключён</span> <span id="role"></span></div>
+  </div>
+</div>
+
+<fieldset>
+  <legend>Состояние</legend>
+  <table id="state"><tr><td>загрузка…</td></tr></table>
+  <button id="refresh">Обновить</button>
+</fieldset>
+
+<fieldset>
+  <legend>Запуск пула (bootstrap)</legend>
+  <div class="hint">bootstrap() забирает стартовые суммы с кошелька администратора и выпускает ему первые BSKUSD. Выполняется один раз. Сначала нужен approve каждой монеты.</div>
+  <table id="launch"></table>
+  <button id="b-approve-all">Approve всех</button>
+  <button id="b-boot">bootstrap()</button>
+</fieldset>
+
+<fieldset>
+  <legend>Пауза монет</legend>
+  <div class="row">Слот <select id="p-slot"></select>
+    <button id="p-pause">pause_token</button> <button id="p-unpause">unpause_token</button></div>
+  <div class="row">Новый pauser <input type="text" id="p-addr" placeholder="0x… (пусто = снять)"> <button id="p-set">set_pauser</button></div>
+</fieldset>
+
+<fieldset>
+  <legend>Комиссии (б.п., задержка 7 дней)</legend>
+  <div class="row">Вход <input class="n" id="f-mint" type="number" min="0" max="6"> Обмен <input class="n" id="f-swap" type="number" min="0" max="6"> Выход <input class="n" id="f-burn" type="number" min="0" max="6"></div>
+  <div class="hint">Каждая ≤ 6; обмен = 0 или обмен &lt; вход + выход.</div>
+  <button id="f-sched">schedule_fees</button> <button id="f-apply">apply_fees</button> <button id="f-cancel">cancel_fees</button>
+  <div id="f-info" class="hint"></div>
+</fieldset>
+
+<fieldset>
+  <legend>Амплификация (ann)</legend>
+  <div id="a-info" class="hint"></div>
+  <div class="row">Новое ann <input class="n" id="a-new" type="number" step="60"> <span class="hint">кратно 60, 120…999 960, не больше ×2 за шаг</span></div>
+  <button id="a-sched">schedule_ann_change</button> <button id="a-apply">apply_ann_change</button> <button id="a-cancel">cancel_ann_change</button>
+</fieldset>
+
+<fieldset>
+  <legend>Добавление монеты</legend>
+  <div class="row">Токен <input type="text" id="t-addr" placeholder="0x…"></div>
+  <div class="row">Сумма (в единицах токена) <input class="n" id="t-amt" type="text"> <button id="t-approve">approve</button> <button id="t-sched">schedule_add_token</button></div>
+  <div class="row">Мин. BSKUSD при исполнении <input class="n" id="t-min" type="text" value="0"> <button id="t-exec">execute_add_token</button> <button id="t-cancel">cancel_add_token</button></div>
+  <div id="t-info" class="hint"></div>
+</fieldset>
+
+<fieldset>
+  <legend>Ротация слота</legend>
+  <div class="hint">Слот должен быть на паузе. Порядок: approve новой монеты → fund_rotation → schedule_rotation → (после задержки) execute_rotation.</div>
+  <div class="row">Слот <select id="r-slot"></select> Новый токен <input type="text" id="r-tok" placeholder="0x…"></div>
+  <div class="row">Сумма (в единицах нового токена) <input class="n" id="r-amt" type="text">
+    <button id="r-approve">approve</button> <button id="r-fund">fund_rotation</button></div>
+  <div class="row"><button id="r-sched">schedule_rotation</button> <button id="r-exec">execute_rotation</button>
+    <button id="r-cancel">cancel_rotation</button> <button id="r-reclaim">reclaim_rotation</button></div>
+  <div id="r-info" class="hint"></div>
+</fieldset>
+
+<fieldset>
+  <legend>System Revenue и хранилище стейкинга</legend>
+  <div id="s-info" class="hint"></div>
+  <div class="row">Хранилище <input type="text" id="s-vault" placeholder="0x…"> доля System Revenue, б.п. <input class="n" id="s-bp" type="number" min="500" max="9500">
+    <button id="s-vault-set">set_staking_vault</button></div>
+  <div class="hint">Подключается один раз, отменить нельзя.</div>
+  <div class="row">Новая доля, б.п. <input class="n" id="s-new" type="number" min="500" max="9500">
+    <button id="s-sched">schedule_split</button> <button id="s-apply">apply_split</button> <button id="s-cancel">cancel_split</button></div>
+</fieldset>
+
+<fieldset>
+  <legend>Администратор</legend>
+  <div class="row">Новый админ <input type="text" id="ad-new" placeholder="0x…"> <button id="ad-prop">propose_admin</button></div>
+  <div class="row"><button id="ad-accept">accept_admin</button> <span class="hint">вызывает новый администратор</span></div>
+</fieldset>
+
+<fieldset>
+  <legend>Забрать ожидающие выплаты (claim)</legend>
+  <table id="claims"></table>
+  <div class="row">Получатель <input type="text" id="cl-to" placeholder="пусто = мой адрес"></div>
+</fieldset>
+
+<fieldset>
+  <legend>Журнал</legend>
+  <div id="log"></div>
+</fieldset>
+
+<script src="assets/vendor/ethers-5.7.2.umd.min.js"></script>
+<script src="assets/vendor/walletconnect-ethereum-provider-2.17.0.umd.js" defer></script>
+<script src="assets/js/wallet.js"></script>
+<script src="assets/js/pool.js"></script>
+<script src="assets/js/admin.js" defer></script>
+</body>
+</html>
