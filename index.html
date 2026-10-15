@@ -1,11 +1,10 @@
-<!DOCTYPE html>
-<html lang="ru">
+<!doctype html>
+<html lang="en">
 <head>
-<meta charset="UTF-8"/>
+<meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Basket USD</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
 :root{
   --bg0:#0d0e14;--bg1:#13141c;--bg2:#1a1b26;--bg3:#22243a;
   --border:#2a2d45;--border2:#363a5a;
@@ -14,22 +13,35 @@
   --green:#1fd18a;--green-bg:#0d2620;
   --red:#f06060;--red-bg:#2a1414;
   --amber:#f5a623;--amber-bg:#2a2010;--blue:#5b8af7;
-  --font:Inter,-apple-system,sans-serif;
+  --font:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 }
+*{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg0);color:var(--txt);font-family:var(--font);min-height:100vh}
-.nav{display:flex;align-items:center;justify-content:space-between;padding:14px 28px;border-bottom:1px solid var(--border);background:var(--bg1);position:sticky;top:0;z-index:10}
+
+/* ---------- nav ---------- */
+.nav{display:flex;align-items:center;justify-content:space-between;padding:14px 28px;
+     border-bottom:1px solid var(--border);background:var(--bg1);position:sticky;top:0;z-index:10}
 .nav-logo{display:flex;align-items:center;gap:10px}
-.logo-icon{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--green));display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff}
+.logo-icon{width:30px;height:30px;border-radius:50%;
+           background:linear-gradient(135deg,var(--purple),var(--green));
+           display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff}
 .logo-name{font-size:15px;font-weight:700}
-.net-pill{font-size:11px;padding:3px 10px;border-radius:20px;background:var(--purple-bg);color:var(--purple2);border:1px solid var(--border2)}
-.admin-pill{font-size:11px;padding:3px 10px;border-radius:20px;background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber);display:none}
-.btn-wallet{font-size:13px;padding:7px 16px;border-radius:12px;border:1px solid var(--border2);background:var(--bg2);color:var(--txt);cursor:pointer}
+.net-pill{font-size:11px;padding:3px 10px;border-radius:20px;background:var(--purple-bg);
+          color:var(--purple2);border:1px solid var(--border2)}
+.admin-pill{font-size:11px;padding:3px 10px;border-radius:20px;background:var(--amber-bg);
+            color:var(--amber);border:1px solid var(--amber);display:none}
+.btn-wallet{font-size:13px;padding:7px 16px;border-radius:12px;border:1px solid var(--border2);
+            background:var(--bg2);color:var(--txt);cursor:pointer;font-family:inherit}
 .btn-wallet:hover{border-color:var(--purple);color:var(--purple2)}
 .btn-wallet.connected{border-color:var(--green);color:var(--green)}
-.addr-mono{font-family:monospace;font-size:11px;color:var(--txt3)}
-.main{padding:20px 28px;max-width:1240px;margin:0 auto;display:grid;grid-template-columns:1fr 400px;gap:20px;align-items:start}
-@media(max-width:880px){.main{grid-template-columns:1fr;padding:14px}}
+.addr-mono{font-family:ui-monospace,monospace;font-size:11px;color:var(--txt3)}
 
+/* ---------- layout ---------- */
+.main{padding:20px 28px 60px;max-width:1240px;margin:0 auto;display:grid;
+      grid-template-columns:1fr 400px;gap:20px;align-items:start}
+@media(max-width:880px){.main{grid-template-columns:1fr;padding:14px 14px 40px}}
+
+/* ---------- hero ---------- */
 .hero{background:var(--bg1);border:1px solid var(--border);border-radius:18px;padding:22px 24px;margin-bottom:16px}
 .hero-top{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:20px;flex-wrap:wrap;gap:14px}
 .hero-lbl{font-size:12px;color:var(--txt3);margin-bottom:4px}
@@ -39,7 +51,8 @@ body{background:var(--bg0);color:var(--txt);font-family:var(--font);min-height:1
 .hm b{display:block;font-size:16px;color:var(--txt);font-weight:700;margin-top:3px}
 .hm.warn b{color:var(--red)}
 .stack{display:flex;height:56px;border-radius:12px;overflow:hidden;border:1px solid var(--border)}
-.seg{position:relative;cursor:pointer;transition:filter .15s;display:flex;align-items:center;justify-content:center;min-width:3px}
+.seg{position:relative;cursor:pointer;transition:filter .15s;display:flex;align-items:center;
+     justify-content:center;min-width:3px}
 .seg:hover{filter:brightness(1.3)}
 .seg.active{outline:2px solid var(--txt);outline-offset:-2px}
 .seg-lbl{font-size:11px;font-weight:800;color:#0d0e14;white-space:nowrap;padding:0 4px;overflow:hidden}
@@ -47,15 +60,32 @@ body{background:var(--bg0);color:var(--txt);font-family:var(--font);min-height:1
 .stack-axis{position:relative;height:18px;margin-bottom:14px}
 .cap-mark{position:absolute;top:0;transform:translateX(-50%);font-size:10px;color:var(--red);white-space:nowrap}
 .cap-mark::before{content:'';position:absolute;left:50%;top:-8px;width:1px;height:8px;background:var(--red)}
-.legend{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-bottom:14px}
-.lg{background:var(--bg2);border:1px solid var(--border);border-radius:11px;padding:9px 11px;cursor:pointer;border-left:3px solid}
+.legend{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:14px 0}
+.lg{background:var(--bg2);border:1px solid var(--border);border-radius:11px;padding:9px 11px;
+    cursor:pointer;border-left:3px solid}
 .lg:hover{border-color:var(--border2)}
 .lg-top{display:flex;align-items:center;justify-content:space-between;gap:6px}
 .lg-name{font-size:12px;font-weight:700}
 .lg-share{font-size:11px;color:var(--txt3)}
 .lg-amt{font-size:15px;font-weight:700;margin-top:2px}
-.lg-usd{font-size:11px;color:var(--txt3);margin-top:1px}
-.price-box{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-top:14px;display:none}
+
+/* ---------- slot detail / prices ---------- */
+.slot-detail{background:var(--bg2);border:1px solid var(--border2);border-radius:12px;
+             padding:12px 14px;margin-top:12px;display:none}
+.slot-detail.show{display:block}
+.sd-top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
+.sd-name{font-size:17px;font-weight:700}
+.sd-link{font-size:11px;color:var(--purple2);text-decoration:none}
+.sd-link:hover{text-decoration:underline}
+.paused-tag{font-size:10px;font-weight:700;color:var(--red);background:var(--red-bg);
+            border:1px solid var(--red);border-radius:6px;padding:1px 6px;margin-left:8px}
+.sd-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px}
+.sd-cell{background:var(--bg1);border:1px solid var(--border);border-radius:9px;padding:8px 10px}
+.sd-k{font-size:10px;color:var(--txt3)}
+.sd-v{font-size:13px;font-weight:700;margin-top:2px}
+.sd-addr{font-family:ui-monospace,monospace;font-size:10px;color:var(--txt3);margin-top:10px;word-break:break-all}
+.price-box{background:var(--bg2);border:1px solid var(--border);border-radius:12px;
+           padding:12px 14px;margin-top:12px;display:none}
 .price-box.show{display:block}
 .pb-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:8px}
 .pb-val{font-size:24px;font-weight:800}
@@ -64,155 +94,163 @@ body{background:var(--bg0);color:var(--txt);font-family:var(--font);min-height:1
 .pb-cell{font-size:11px;color:var(--txt3)}
 .pb-cell b{display:block;font-size:13px;color:var(--txt);margin-top:2px}
 .pb-cell.off b{color:var(--red)}
-.btn-max{background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:3px 8px;font-size:10px;font-weight:700;color:var(--txt3);cursor:pointer}
-.btn-max:hover{color:var(--purple2);border-color:var(--purple)}
-.slot-detail{background:var(--bg2);border:1px solid var(--border);border-radius:13px;padding:14px 16px;display:none}
-.slot-detail.show{display:block}
-.sd-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:10px;flex-wrap:wrap}
-.sd-name{font-size:17px;font-weight:700}
-.sd-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:9px}
-.sd-cell{background:var(--bg1);border:1px solid var(--border);border-radius:10px;padding:9px 11px}
-.sd-k{font-size:10px;color:var(--txt3);margin-bottom:3px}
-.sd-v{font-size:14px;font-weight:700}
-.sd-addr{font-family:monospace;font-size:11px;color:var(--txt3);word-break:break-all;margin-top:10px}
-.sd-link{color:var(--purple2);text-decoration:none;font-size:11px}
-.sd-link:hover{text-decoration:underline}
-.paused-tag{font-size:10px;padding:1px 6px;border-radius:6px;background:var(--red-bg);color:var(--red);margin-left:6px}
 
-.card{background:var(--bg1);border:1px solid var(--border);border-radius:16px;padding:16px 20px;margin-bottom:16px}
-.card-title{font-size:12px;font-weight:700;color:var(--txt2)}
+/* ---------- cards ---------- */
+.card{background:var(--bg1);border:1px solid var(--border);border-radius:14px;
+      padding:14px 16px;margin-bottom:12px}
+.card-title{font-size:15px;font-weight:700}
 .collapse-head{display:flex;justify-content:space-between;align-items:center;cursor:pointer;user-select:none}
-.collapse-head:hover .card-title{color:var(--txt)}
-.chev{font-size:12px;color:var(--txt3);transition:transform .2s}
+.chev{color:var(--txt2);transition:transform .15s;font-size:13px}
 .chev.open{transform:rotate(180deg)}
-.cbody{display:none;margin-top:14px}
+.cbody{display:none;margin-top:12px}
 .cbody.open{display:block}
-.stale{opacity:.4}
-
-.bal-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
-.bal-item{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:10px}
-.bal-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.bal-info{flex:1;min-width:0}
-.bal-name{font-size:12px;color:var(--txt3)}
-.bal-val{font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.fee3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
-.f3{background:var(--bg2);border:1px solid var(--border);border-radius:11px;padding:10px 12px;text-align:center}
-.f3-k{font-size:11px;color:var(--txt3);margin-bottom:3px}
-.f3-v{font-size:17px;font-weight:800}
-.fee-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:12px}
-.fee-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.fee-name{color:var(--txt2);flex:1}
-.fee-val{font-weight:600}
-
-.panel{background:var(--bg1);border:1px solid var(--border);border-radius:20px;padding:20px;position:sticky;top:72px;max-height:calc(100vh - 92px);overflow-y:auto}
-.tabs{display:flex;gap:3px;background:var(--bg2);border-radius:12px;padding:4px;margin-bottom:18px;flex-wrap:wrap}
-.tab{flex:1;min-width:54px;padding:8px 4px;font-size:12px;font-weight:700;text-align:center;cursor:pointer;border-radius:9px;border:none;background:transparent;color:var(--txt3)}
-.tab.active{background:var(--bg3);color:var(--txt)}
-.tab.admin.active{background:var(--amber-bg);color:var(--amber)}
-.tab.admin{display:none}
-.token-input{background:var(--bg2);border:1px solid var(--border);border-radius:13px;padding:14px 16px;margin-bottom:8px}
-.token-input:focus-within{border-color:var(--border2)}
-.ti-label{font-size:11px;color:var(--txt3);margin-bottom:8px}
-.ti-row{display:flex;align-items:center;gap:8px}
-.ti-amt{flex:1;background:transparent;border:none;font-size:22px;font-weight:700;color:var(--txt);outline:none;min-width:0;width:100%}
-.ti-amt::placeholder{color:var(--txt3)}
-.ti-select{background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:7px 10px;font-size:13px;font-weight:700;color:var(--txt);cursor:pointer;outline:none}
-.ti-tag{background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:7px 12px;font-size:13px;font-weight:700;color:var(--txt2)}
-.arrow-btn{display:flex;justify-content:center;margin:4px 0}
-.arrow-btn button{background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:6px 16px;color:var(--txt2);cursor:pointer;font-size:17px}
-.arrow-btn button:hover{color:var(--txt);border-color:var(--purple)}
-.quote-box{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin:10px 0}
-.qb-label{font-size:11px;color:var(--txt3);margin-bottom:4px}
-.qb-val{font-size:20px;font-weight:700;color:var(--green)}
-.qb-sub{font-size:11px;color:var(--txt3);margin-top:3px;line-height:1.5}
-.slip-row{display:flex;align-items:center;gap:6px;margin:10px 0;flex-wrap:wrap}
-.slip-label{font-size:11px;color:var(--txt3)}
-.slip-btn{font-size:12px;padding:4px 10px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--txt3);cursor:pointer}
-.slip-btn.active{border-color:var(--purple);color:var(--purple2);background:var(--purple-bg)}
-.slip-inp{width:55px;padding:4px 7px;font-size:12px;border-radius:8px;border:1px solid var(--border);background:var(--bg2);color:var(--txt);outline:none}
-.btn-action{width:100%;padding:14px;font-size:14px;font-weight:800;border-radius:14px;border:none;background:linear-gradient(90deg,var(--purple),var(--blue));color:#fff;cursor:pointer;margin-top:10px}
-.btn-action:hover{opacity:.9}
-.btn-action:disabled{opacity:.3;cursor:not-allowed}
-.btn-action.red{background:linear-gradient(90deg,#c0392b,var(--red))}
-.btn-action.amber{background:linear-gradient(90deg,#b8791a,var(--amber));color:#1a1200}
-.btn-sm{padding:8px 12px;font-size:12px;font-weight:700;border-radius:10px;border:1px solid var(--border2);background:var(--bg2);color:var(--txt);cursor:pointer}
-.btn-sm:hover{border-color:var(--purple)}
-.btn-sm.danger{border-color:#5a2020;color:var(--red)}
-.status{font-size:12px;padding:10px 14px;border-radius:10px;margin-bottom:12px;display:none;line-height:1.5;word-break:break-word}
-.status.info{background:var(--purple-bg);color:var(--purple2);display:block}
-.status.success{background:var(--green-bg);color:var(--green);display:block}
-.status.error{background:var(--red-bg);color:var(--red);display:block}
-.divider{display:flex;align-items:center;gap:8px;margin:14px 0 10px;font-size:11px;color:var(--txt3)}
+.note{font-size:11px;color:var(--txt3);line-height:1.5;margin-top:10px}
+.divider{display:flex;align-items:center;gap:8px;margin:12px 0;font-size:11px;color:var(--txt3)}
 .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
-.burn-all{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:8px 0}
-.ba-item{background:var(--bg2);border:1px solid var(--border);border-radius:11px;padding:9px 11px;cursor:pointer}
-.ba-item.selected{border-color:var(--purple)}
-.ba-item.closed{opacity:.45;cursor:not-allowed}
-.ba-name{font-size:11px;color:var(--txt3);margin-bottom:3px}
-.ba-val{font-size:14px;font-weight:700}
-.ff-item{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:8px 10px;display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px}
-.ff-item.on{border-color:var(--red);background:var(--red-bg)}
-.stake-info{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
-.si-item{background:var(--bg2);border:1px solid var(--border);border-radius:11px;padding:10px 12px}
-.si-label{font-size:11px;color:var(--txt3);margin-bottom:4px}
-.si-val{font-size:15px;font-weight:700}
-.adm-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:7px 0;border-bottom:1px solid var(--border)}
-.adm-row:last-child{border-bottom:none}
-.adm-k{color:var(--txt3)}
-.adm-v{font-weight:600;font-size:12px;text-align:right;word-break:break-all;max-width:62%}
-.adm-inp{width:100%;padding:9px 11px;font-size:13px;border-radius:10px;border:1px solid var(--border);background:var(--bg2);color:var(--txt);outline:none;margin-bottom:6px;font-family:monospace}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
-.pending{background:var(--amber-bg);border:1px solid var(--amber);border-radius:11px;padding:10px 12px;margin:8px 0;font-size:12px;line-height:1.6}
-.pending-none{background:var(--bg2);border:1px solid var(--border);border-radius:11px;padding:10px 12px;margin:8px 0;font-size:12px;color:var(--txt3);line-height:1.6}
-.warn{background:var(--red-bg);border:1px solid #5a2020;border-radius:11px;padding:10px 12px;margin:8px 0;font-size:11px;color:#ffb0b0;line-height:1.6}
-.note{font-size:11px;color:var(--txt3);line-height:1.6;margin:6px 0}
+.bal-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.bal-item{display:flex;align-items:center;gap:8px;background:var(--bg2);border:1px solid var(--border);
+          border-radius:11px;padding:9px 11px}
+.bal-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.bal-name{font-size:11px;color:var(--txt3)}
+.bal-val{font-size:13px;font-weight:700}
+.kv{display:flex;justify-content:space-between;gap:12px;padding:5px 0;font-size:12px;align-items:baseline}
+.kv-k{color:var(--txt2)}
+.kv-v{font-weight:700;text-align:right}
+.kv-v.mono{font-family:ui-monospace,monospace;font-size:11px;font-weight:400;color:var(--txt3)}
+.fee-row{display:flex;align-items:center;gap:8px;padding:5px 0}
+.fee-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.fee-name{flex:1;font-size:13px}
+.fee-val{font-size:13px;font-weight:700}
+.fee3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.f3{background:var(--bg2);border:1px solid var(--border);border-radius:11px;padding:9px 11px}
+.f3-k{font-size:10px;color:var(--txt3)}
+.f3-v{font-size:15px;font-weight:700;margin-top:2px}
+.warn{background:var(--amber-bg);border:1px solid var(--amber);color:var(--amber);
+      border-radius:9px;padding:9px 11px;font-size:11px;line-height:1.5;margin-top:10px}
+.danger{background:var(--red-bg);border:1px solid var(--red);color:var(--red);
+        border-radius:9px;padding:9px 11px;font-size:11px;line-height:1.5;margin-top:10px}
+
+/* ---------- panel ---------- */
+.panel{background:var(--bg1);border:1px solid var(--border);border-radius:18px;padding:16px;
+       position:sticky;top:76px}
+@media(max-width:880px){.panel{position:static}}
+.tabs{display:flex;gap:3px;background:var(--bg2);border:1px solid var(--border);
+      border-radius:12px;padding:4px;margin-bottom:12px}
+.tab{flex:1;min-width:0;font-size:10px;font-weight:700;padding:7px 3px;border-radius:8px;border:none;
+     background:transparent;color:var(--txt2);cursor:pointer;font-family:inherit;white-space:nowrap}
+.tab:hover{color:var(--txt)}
+.tab.active{background:var(--bg3);color:var(--txt)}
+.tab.admin{color:var(--amber)}
+.status{display:none;border-radius:9px;padding:9px 11px;font-size:11px;line-height:1.45;margin-bottom:10px}
+.status.show{display:block}
+.status.info{background:var(--purple-bg);border:1px solid var(--border2);color:var(--purple2)}
+.status.success{background:var(--green-bg);border:1px solid var(--green);color:var(--green)}
+.status.error{background:var(--red-bg);border:1px solid var(--red);color:var(--red)}
+.token-input{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:11px 13px;margin-bottom:8px}
+.token-input.bad{border-color:var(--red)}
+.ti-label{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--txt3);margin-bottom:6px}
+.ti-row{display:flex;align-items:center;gap:8px}
+.ti-amt{flex:1;min-width:0;background:transparent;border:none;outline:none;color:var(--txt);
+        font-size:22px;font-weight:800;font-family:inherit;width:100%}
+.ti-amt::placeholder{color:var(--txt3)}
+.ti-amt:disabled{color:var(--txt2)}
+.ti-sel{background:var(--bg3);border:1px solid var(--border2);border-radius:9px;color:var(--txt);
+        font-size:13px;font-weight:700;padding:6px 8px;font-family:inherit;cursor:pointer;max-width:160px}
+.btn-max{background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:3px 8px;
+         font-size:10px;font-weight:700;color:var(--txt3);cursor:pointer;font-family:inherit}
+.btn-max:hover{color:var(--purple2);border-color:var(--purple)}
+.flip{display:flex;justify-content:center;margin:2px 0 8px}
+.btn-flip{width:34px;height:34px;border-radius:9px;background:var(--bg3);border:1px solid var(--border2);
+          color:var(--txt2);cursor:pointer;font-size:14px}
+.btn-flip:hover{color:var(--purple2);border-color:var(--purple)}
+.rate{display:flex;justify-content:space-between;font-size:11px;color:var(--txt3);padding:2px 2px 8px}
+.rate b{color:var(--txt);font-weight:700}
+.slip{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:11px;color:var(--txt3);margin-bottom:10px}
+.slip-btn{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:3px 9px;
+          font-size:11px;color:var(--txt2);cursor:pointer;font-family:inherit}
+.slip-btn.on{border-color:var(--purple);color:var(--purple2);background:var(--purple-bg)}
+.slip-in{width:58px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;
+         padding:3px 7px;font-size:11px;color:var(--txt);font-family:inherit;outline:none}
+.btn-go{width:100%;padding:12px;border-radius:12px;border:1px solid var(--purple);
+        background:var(--purple);color:#0d0e14;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit}
+.btn-go:hover:not(:disabled){filter:brightness(1.1)}
+.btn-go:disabled{opacity:.45;cursor:not-allowed}
+.btn-go.sec{background:var(--bg2);border-color:var(--border2);color:var(--txt)}
+.btn-go.danger{background:var(--red-bg);border-color:var(--red);color:var(--red)}
+.why{font-size:11px;color:var(--red);margin-top:8px;line-height:1.45;display:none}
+.why.show{display:block}
+.sub{font-size:11px;color:var(--txt3);line-height:1.5;margin:8px 0}
+.seg-switch{display:flex;gap:4px;background:var(--bg2);border:1px solid var(--border);
+            border-radius:10px;padding:3px;margin-bottom:10px}
+.seg-switch button{flex:1;font-size:11px;font-weight:700;padding:6px;border-radius:7px;border:none;
+                   background:transparent;color:var(--txt2);cursor:pointer;font-family:inherit}
+.seg-switch button.on{background:var(--bg3);color:var(--txt)}
+.adm-sec{background:var(--bg2);border:1px solid var(--border);border-radius:11px;
+         padding:10px 12px;margin-bottom:8px}
+.adm-head{display:flex;justify-content:space-between;align-items:center;cursor:pointer;user-select:none}
+.adm-title{font-size:12px;font-weight:700}
+.adm-body{display:none;margin-top:10px}
+.adm-body.open{display:block}
+.adm-in{width:100%;background:var(--bg1);border:1px solid var(--border2);border-radius:8px;
+        padding:7px 9px;font-size:12px;color:var(--txt);font-family:inherit;outline:none;margin-bottom:6px}
+.adm-row3{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.btn-s{padding:7px 10px;border-radius:8px;border:1px solid var(--border2);background:var(--bg3);
+       color:var(--txt);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit}
+.btn-s:hover{border-color:var(--purple);color:var(--purple2)}
+.btn-s.go{background:var(--purple);border-color:var(--purple);color:#0d0e14}
+.btn-s.dn{background:var(--red-bg);border-color:var(--red);color:var(--red)}
+.pending{background:var(--amber-bg);border:1px solid var(--amber);border-radius:9px;
+         padding:9px 11px;font-size:11px;color:var(--amber);line-height:1.5;margin-bottom:6px}
 </style>
 </head>
 <body>
+
 <nav class="nav">
   <div class="nav-logo">
     <div class="logo-icon">BSK</div>
     <span class="logo-name">Basket USD</span>
-    <span class="net-pill">Sepolia</span>
-    <span class="admin-pill" id="admin-pill">админ</span>
+    <span class="net-pill" id="net-pill">Sepolia</span>
+    <span class="admin-pill" id="admin-pill">Admin</span>
   </div>
   <div style="display:flex;align-items:center;gap:10px">
     <span class="addr-mono" id="addr-display"></span>
-    <button class="btn-wallet" id="btn-wallet" onclick="connectWallet()">Подключить кошелёк</button>
+    <button class="btn-wallet" id="btn-wallet">Connect Wallet</button>
   </div>
 </nav>
+
 <div class="main">
+
+  <!-- ================= left column ================= -->
   <div>
     <div class="hero">
       <div class="hero-top">
         <div>
-          <div class="hero-lbl">В корзине</div>
+          <div class="hero-lbl">Balance Total</div>
           <div class="hero-tvl" id="hero-tvl">—</div>
         </div>
         <div class="hero-meta">
-          <div class="hm">выпущено<b id="hero-supply">—</b></div>
-          <div class="hm">инвариант D<b id="hero-d">—</b></div>
-          <div class="hm" id="hm-vp">обеспечение<b id="hero-vp">—</b></div>
-          <div class="hm">параметр A<b id="hero-a">—</b></div>
-          <div class="hm">потолок доли<b id="hero-cap">—</b></div>
-          <div class="hm">активов<b id="hero-n">—</b></div>
+          <div class="hm">Supply<b id="hero-supply">—</b></div>
+          <div class="hm" id="hero-backing-wrap">Backing<b id="hero-backing">—</b></div>
+          <div class="hm">Assets<b id="hero-n">—</b></div>
         </div>
       </div>
-      <div class="stack" id="stack"></div>
+
       <div class="stack-axis" id="stack-axis"></div>
+      <div class="stack" id="stack"></div>
+
       <div class="legend" id="legend"></div>
+
       <div class="slot-detail" id="slot-detail"></div>
-      <div class="note" id="hero-note">Нажмите на сегмент или карточку, чтобы раскрыть слот.</div>
+      <div class="note" id="hero-note">Click a segment or a card to inspect a slot.</div>
 
       <div class="price-box" id="price-box">
         <div class="pb-head">
           <div>
-            <div class="pb-lbl">Оценка обеспечения по внешним ценам</div>
+            <div class="pb-lbl">Backing At External Prices</div>
             <div class="pb-val" id="pb-value">—</div>
           </div>
           <div style="text-align:right">
-            <div class="pb-lbl">Расчётная цена BSKUSD</div>
+            <div class="pb-lbl">Implied BSKUSD Price</div>
             <div class="pb-val" id="pb-unit">—</div>
           </div>
         </div>
@@ -222,14 +260,15 @@ body{background:var(--bg0);color:var(--txt);font-family:var(--font);min-height:1
     </div>
 
     <div class="card" id="card-pending" style="display:none;border-color:var(--amber)">
-      <div class="card-title" style="color:var(--amber)">Объявленные изменения</div>
-      <div id="pending-list"></div>
-      <div class="note">Каждое изменение объявляется заранее, чтобы несогласный успел выйти. До наступления срока ничего не происходит.</div>
+      <div class="card-title" style="color:var(--amber)">Announced Changes</div>
+      <div id="pending-list" style="margin-top:10px"></div>
+      <div class="note">Every change is announced in advance so anyone who disagrees has time to
+        exit. Nothing happens until the delay has elapsed.</div>
     </div>
 
     <div class="card">
       <div class="collapse-head" onclick="toggleCollapse('bal')">
-        <div class="card-title">Мои балансы</div><span class="chev" id="chev-bal">▾</span>
+        <div class="card-title">My Balances</div><span class="chev" id="chev-bal">▾</span>
       </div>
       <div class="cbody" id="body-bal">
         <div class="bal-grid" id="bal-grid"></div>
@@ -239,1176 +278,1209 @@ body{background:var(--bg0);color:var(--txt);font-family:var(--font);min-height:1
 
     <div class="card">
       <div class="collapse-head" onclick="toggleCollapse('lim')">
-        <div class="card-title">Пределы операций</div><span class="chev" id="chev-lim">▾</span>
+        <div class="card-title">Operation Limits</div><span class="chev" id="chev-lim">▾</span>
       </div>
       <div class="cbody" id="body-lim"><div id="limits"></div></div>
     </div>
 
     <div class="card">
       <div class="collapse-head" onclick="toggleCollapse('fee')">
-        <div class="card-title">Куда идёт комиссия</div><span class="chev" id="chev-fee">▾</span>
+        <div class="card-title">Fee Distribution</div><span class="chev" id="chev-fee">▾</span>
       </div>
       <div class="cbody" id="body-fee">
         <div id="fee-rates"></div>
-        <div class="divider">накоплено</div>
-        <div class="fee-row"><div class="fee-dot" style="background:var(--amber)"></div><div class="fee-name">Казна</div><div class="fee-val" id="fd-treasury">—</div></div>
-        <div class="fee-row"><div class="fee-dot" style="background:var(--purple)"></div><div class="fee-name">Стейкеры wsUSD</div><div class="fee-val" id="fd-wsusd">—</div></div>
+        <div class="divider">Accrued</div>
+        <div class="fee-row"><div class="fee-dot" style="background:var(--amber)"></div>
+          <div class="fee-name">Treasury</div><div class="fee-val" id="fd-treasury">—</div></div>
+        <div class="fee-row"><div class="fee-dot" style="background:var(--purple)"></div>
+          <div class="fee-name">sBSKUSD Stakers</div><div class="fee-val" id="fd-vault">—</div></div>
         <div class="note" id="fd-note"></div>
       </div>
     </div>
+
+    <!-- technical parameters, separated from everything a user acts on -->
+    <div class="card">
+      <div class="collapse-head" onclick="toggleCollapse('tech')">
+        <div class="card-title">Protocol Parameters</div><span class="chev" id="chev-tech">▾</span>
+      </div>
+      <div class="cbody" id="body-tech">
+        <div id="tech-list"></div>
+        <div class="note">These values describe the curve and the governance schedule. They do not
+          change what you can do with the pool — they explain why the limits above are what they
+          are.</div>
+      </div>
+    </div>
   </div>
 
+  <!-- ================= right panel ================= -->
   <div class="panel">
     <div class="status" id="status-msg"></div>
+
     <div class="tabs">
-      <button class="tab active" onclick="setTab('swap',this)">Обмен</button>
-      <button class="tab" onclick="setTab('mint',this)">Внести</button>
-      <button class="tab" onclick="setTab('burn',this)">Вывести</button>
-      <button class="tab" onclick="setTab('prop',this)">Корзиной</button>
-      <button class="tab" onclick="setTab('stake',this)">Стейкинг</button>
-      <button class="tab admin" id="tab-admin" onclick="setTab('admin',this)">Админ</button>
+      <button class="tab active" data-tab="swap"    onclick="setTab('swap',this)">Swap</button>
+      <button class="tab"        data-tab="mint"    onclick="setTab('mint',this)">Deposit</button>
+      <button class="tab"        data-tab="burn"    onclick="setTab('burn',this)">Withdraw</button>
+      <button class="tab"        data-tab="prop"    onclick="setTab('prop',this)">Basket</button>
+      <button class="tab"        data-tab="stake"   onclick="setTab('stake',this)">Staking</button>
+      <button class="tab admin"  data-tab="admin" id="tab-admin" onclick="setTab('admin',this)">Admin</button>
     </div>
 
+    <!-- ---------- swap ---------- -->
     <div id="pnl-swap">
-      <div class="token-input"><div class="ti-label">Отдаёте</div>
-        <div class="ti-row"><button class="btn-max" onclick="maxSwap()">макс</button><input class="ti-amt" id="sw-amt" type="number" placeholder="0.0" oninput="dq('sw')" min="0"/>
-        <select class="ti-select" id="sw-from" onchange="dq('sw')"></select></div></div>
-      <div class="arrow-btn"><button onclick="flipSwap()">⇅</button></div>
-      <div class="token-input"><div class="ti-label">Получите</div>
-        <div class="ti-row"><input class="ti-amt" id="sw-out" placeholder="0.0" readonly style="color:var(--green)"/>
-        <select class="ti-select" id="sw-to" onchange="dq('sw')"></select></div></div>
-      <div class="quote-box" id="sw-qbox" style="display:none">
-        <div class="qb-label">Курс</div><div class="qb-val" id="sw-rate">—</div><div class="qb-sub" id="sw-sub"></div></div>
-      <div class="slip-row"><span class="slip-label">Допуск</span>
-        <button class="slip-btn active" onclick="setSlip('sw',0.1,this)">0.1%</button>
-        <button class="slip-btn" onclick="setSlip('sw',0.5,this)">0.5%</button>
-        <button class="slip-btn" onclick="setSlip('sw',1,this)">1%</button>
-        <input class="slip-inp" type="number" placeholder="%" oninput="cSlip('sw',this)"/></div>
-      <button class="btn-action" id="btn-swap" onclick="doSwap()" disabled>Обменять</button>
-    </div>
-
-    <div id="pnl-mint" style="display:none">
-      <div class="token-input"><div class="ti-label">Вносите</div>
-        <div class="ti-row"><button class="btn-max" onclick="maxMint()">макс</button><input class="ti-amt" id="mt-amt" type="number" placeholder="0.0" oninput="dq('mt')" min="0"/>
-        <select class="ti-select" id="mt-tok" onchange="dq('mt')"></select></div></div>
-      <div class="quote-box"><div class="qb-label">Получите</div>
-        <div class="qb-val" id="mt-quote">—</div><div class="qb-sub" id="mt-sub"></div></div>
-      <div class="slip-row"><span class="slip-label">Допуск</span>
-        <button class="slip-btn active" onclick="setSlip('mt',0.1,this)">0.1%</button>
-        <button class="slip-btn" onclick="setSlip('mt',0.5,this)">0.5%</button>
-        <button class="slip-btn" onclick="setSlip('mt',1,this)">1%</button></div>
-      <button class="btn-action" id="btn-mint" onclick="doMint()" disabled>Внести и получить BSKUSD</button>
-    </div>
-
-    <div id="pnl-burn" style="display:none">
-      <div class="token-input"><div class="ti-label">Сжигаете</div>
-        <div class="ti-row"><button class="btn-max" onclick="maxBurn()">макс</button><input class="ti-amt" id="bn-amt" type="number" placeholder="0.0" oninput="dq('bn')" min="0"/>
-        <div class="ti-tag">BSKUSD</div></div></div>
-      <div class="divider">в какой токен</div>
-      <div class="burn-all" id="bn-all"></div>
-      <div class="quote-box"><div class="qb-label">Получите</div>
-        <div class="qb-val" id="bn-quote">—</div><div class="qb-sub" id="bn-sub"></div></div>
-      <div class="slip-row"><span class="slip-label">Допуск</span>
-        <button class="slip-btn active" onclick="setSlip('bn',0.1,this)">0.1%</button>
-        <button class="slip-btn" onclick="setSlip('bn',0.5,this)">0.5%</button>
-        <button class="slip-btn" onclick="setSlip('bn',1,this)">1%</button></div>
-      <button class="btn-action" id="btn-burn" onclick="doBurn()" disabled>Сжечь и получить токен</button>
-    </div>
-
-    <div id="pnl-prop" style="display:none">
-      <div class="note">Внести или вывести все токены в пропорции пула. <span style="color:var(--green)">Без проскальзывания</span>, потолок доли не применяется.</div>
-      <div class="divider">внести корзиной</div>
-      <div class="token-input"><div class="ti-label">Хочу получить</div>
-        <div class="ti-row"><input class="ti-amt" id="pm-bsk" type="number" placeholder="0.0" oninput="dq('pm')" min="0"/>
-        <div class="ti-tag">BSKUSD</div></div></div>
-      <div id="pm-amounts" class="burn-all"></div>
-      <div class="quote-box"><div class="qb-label">Получите после комиссии</div>
-        <div class="qb-val" id="pm-quote">—</div><div class="qb-sub" id="pm-sub"></div></div>
-      <button class="btn-action" id="btn-pmint" onclick="doPropMint()" disabled>Внести корзиной</button>
-
-      <div class="divider">вывести корзиной</div>
-      <div class="token-input"><div class="ti-label">Сжигаете</div>
-        <div class="ti-row"><button class="btn-max" onclick="maxPropBurn()">макс</button><input class="ti-amt" id="pb-bsk" type="number" placeholder="0.0" oninput="dq('pb')" min="0"/>
-        <div class="ti-tag">BSKUSD</div></div></div>
-      <div id="pb-amounts" class="burn-all"></div>
-      <div class="qb-sub" id="pb-sub" style="margin:6px 0"></div>
-      <div class="divider">отказ от доли</div>
-      <div class="note">Если токен заблокировал переводы, вывод корзиной откатится целиком. Отметьте такой слот — вы отказываетесь от его доли, и вывод пройдёт по остальным.</div>
-      <div class="burn-all" id="pb-forfeit"></div>
-      <div class="warn" id="pb-warn" style="display:none">Доля отмеченных слотов останется в пуле и достанется оставшимся держателям. BSKUSD спишется полностью.</div>
-      <button class="btn-action red" id="btn-pburn" onclick="doPropBurn()" disabled>Вывести корзиной</button>
-    </div>
-
-    <div id="pnl-stake" style="display:none">
-      <div id="stake-off" style="display:none">
-        <div class="pending-none" style="padding:16px 14px">
-          <b style="color:var(--txt2)">Стейкинг недоступен</b><br/><br/>
-          Вейл <code>wsUSD</code> не подключён: <code>wsUSD()</code> возвращает нулевой адрес.<br/><br/>
-          Пока это так, вся комиссия идёт в казну. Держателю BSKUSD стейкинг ничего не меняет — доход на базовый токен не начисляется ни при каком раскладе, virtual price закреплён на единице.<br/><br/>
-          Раздел заработает, когда администратор вызовет <code>set_wsUSD</code>.
+      <div class="token-input">
+        <div class="ti-label"><span>You Pay</span><button class="btn-max" onclick="setMaxSwap()">MAX</button></div>
+        <div class="ti-row">
+          <input class="ti-amt" id="sw-amt" type="number" placeholder="0.0" min="0" oninput="quoteSwap()"/>
+          <select class="ti-sel" id="sw-from" onchange="quoteSwap()"></select>
         </div>
+      </div>
+      <div class="flip"><button class="btn-flip" onclick="flipSwap()">⇅</button></div>
+      <div class="token-input">
+        <div class="ti-label"><span>You Receive</span></div>
+        <div class="ti-row">
+          <input class="ti-amt" id="sw-out" type="text" placeholder="0.0" disabled/>
+          <select class="ti-sel" id="sw-to" onchange="quoteSwap()"></select>
+        </div>
+      </div>
+      <div class="rate"><span>Rate</span><b id="sw-rate">—</b></div>
+      <div class="slip" id="slip-swap"></div>
+      <button class="btn-go" id="btn-swap" onclick="doSwap()">Swap</button>
+      <div class="why" id="why-swap"></div>
+    </div>
+
+    <!-- ---------- deposit ---------- -->
+    <div id="pnl-mint" style="display:none">
+      <div class="token-input">
+        <div class="ti-label"><span>You Deposit</span><button class="btn-max" onclick="setMaxMint()">MAX</button></div>
+        <div class="ti-row">
+          <input class="ti-amt" id="mt-amt" type="number" placeholder="0.0" min="0" oninput="quoteMint()"/>
+          <select class="ti-sel" id="mt-tok" onchange="quoteMint()"></select>
+        </div>
+      </div>
+      <div class="token-input">
+        <div class="ti-label"><span>You Receive</span></div>
+        <div class="ti-row">
+          <input class="ti-amt" id="mt-out" type="text" placeholder="0.0" disabled/>
+          <span class="ti-sel" style="cursor:default">BSKUSD</span>
+        </div>
+      </div>
+      <div class="rate"><span>Slot Headroom</span><b id="mt-head">—</b></div>
+      <div class="slip" id="slip-mint"></div>
+      <button class="btn-go" id="btn-mint" onclick="doMint()">Deposit</button>
+      <div class="why" id="why-mint"></div>
+    </div>
+
+    <!-- ---------- withdraw ---------- -->
+    <div id="pnl-burn" style="display:none">
+      <div class="token-input" id="wrap-bn-amt">
+        <div class="ti-label"><span>You Burn</span><button class="btn-max" onclick="setMaxBurn()">MAX</button></div>
+        <div class="ti-row">
+          <input class="ti-amt" id="bn-amt" type="number" placeholder="0.0" min="0" oninput="quoteBurn()"/>
+          <span class="ti-sel" style="cursor:default">BSKUSD</span>
+        </div>
+      </div>
+      <div class="token-input">
+        <div class="ti-label"><span>You Receive</span></div>
+        <div class="ti-row">
+          <input class="ti-amt" id="bn-out" type="text" placeholder="0.0" disabled/>
+          <select class="ti-sel" id="bn-tok" onchange="quoteBurn()"></select>
+        </div>
+      </div>
+      <div class="rate"><span>Max For This Asset</span><b id="bn-cap">—</b></div>
+      <div class="slip" id="slip-burn"></div>
+      <button class="btn-go" id="btn-burn" onclick="doBurn()">Withdraw</button>
+      <div class="why" id="why-burn"></div>
+      <div class="note">A single-asset withdrawal is capped by how much that slot can give up
+        without falling through its floor. To take out more, use the Basket tab — proportional
+        withdrawal has no cap and no slippage.</div>
+    </div>
+
+    <!-- ---------- basket ---------- -->
+    <div id="pnl-prop" style="display:none">
+      <div class="sub">Deposit or withdraw every asset in the pool's current proportion.
+        <b style="color:var(--green)">No slippage</b>, and the share cap does not apply.</div>
+      <div class="seg-switch">
+        <button id="pr-tab-in"  class="on" onclick="setPropMode('in')">Deposit Basket</button>
+        <button id="pr-tab-out"           onclick="setPropMode('out')">Withdraw Basket</button>
+      </div>
+
+      <div id="pr-in">
+        <div class="token-input">
+          <div class="ti-label"><span>You Want To Receive</span></div>
+          <div class="ti-row">
+            <input class="ti-amt" id="pi-amt" type="number" placeholder="0.0" min="0" oninput="quotePropIn()"/>
+            <span class="ti-sel" style="cursor:default">BSKUSD</span>
+          </div>
+        </div>
+        <div id="pi-breakdown"></div>
+        <div class="rate"><span>You Receive After Fee</span><b id="pi-net">—</b></div>
+        <button class="btn-go" id="btn-prop-in" onclick="doPropIn()">Deposit Basket</button>
+        <div class="why" id="why-prop-in"></div>
+      </div>
+
+      <div id="pr-out" style="display:none">
+        <div class="token-input">
+          <div class="ti-label"><span>You Burn</span><button class="btn-max" onclick="setMaxPropOut()">MAX</button></div>
+          <div class="ti-row">
+            <input class="ti-amt" id="po-amt" type="number" placeholder="0.0" min="0" oninput="quotePropOut()"/>
+            <span class="ti-sel" style="cursor:default">BSKUSD</span>
+          </div>
+        </div>
+        <div id="po-breakdown"></div>
+        <button class="btn-go" id="btn-prop-out" onclick="doPropOut()">Withdraw Basket</button>
+        <div class="why" id="why-prop-out"></div>
+        <div class="note">Minimum amounts are sent on-chain with the transaction, so the split you
+          see above is the worst case you can receive.</div>
+      </div>
+    </div>
+
+    <!-- ---------- staking ---------- -->
+    <div id="pnl-stake" style="display:none">
+      <div id="stake-off">
+        <div class="warn"><b>Staking Is Not Available</b><br/>
+          The vault is not connected: <code>staking_vault()</code> returns the zero address.
+          Until it is, the whole fee goes to the treasury.</div>
+        <div class="note">Staking changes nothing for a plain BSKUSD holder. The base token does not
+          earn yield under any configuration — virtual price is pinned to one. Only stakers and the
+          treasury receive the fee flow. This section activates once the administrator calls
+          <code>set_staking_vault</code>.</div>
       </div>
       <div id="stake-on" style="display:none">
-        <div class="note">Стейкинг даёт долю потока комиссий. Базовый BSKUSD в цене не растёт — доход получают только стейкеры и держатели казначейского токена.</div>
-        <div class="stake-info">
-          <div class="si-item"><div class="si-label">Курс</div><div class="si-val" id="sk-rate">—</div></div>
-          <div class="si-item"><div class="si-label">Всего в вейле</div><div class="si-val" id="sk-total">—</div></div>
-          <div class="si-item"><div class="si-label">Мои wsUSD</div><div class="si-val" id="sk-mine">—</div></div>
-          <div class="si-item"><div class="si-label">Стоят сейчас</div><div class="si-val" id="sk-value" style="color:var(--green)">—</div></div>
-        </div>
-        <div class="divider">застейкать</div>
-        <div class="token-input"><div class="ti-label">Отдаёте</div>
-          <div class="ti-row"><button class="btn-max" onclick="maxStake()">макс</button><input class="ti-amt" id="sk-in" type="number" placeholder="0.0" oninput="dq('sk')" min="0"/>
-          <div class="ti-tag">BSKUSD</div></div></div>
-        <div class="quote-box"><div class="qb-label">Получите</div>
-          <div class="qb-val" id="sk-quote">—</div><div class="qb-sub" id="sk-sub"></div></div>
-        <button class="btn-action" id="btn-stake" onclick="doStake()" disabled>Застейкать</button>
-        <div class="divider">забрать</div>
-        <div class="token-input"><div class="ti-label">Отдаёте</div>
-          <div class="ti-row"><button class="btn-max" onclick="maxUnstake()">макс</button><input class="ti-amt" id="sk-out" type="number" placeholder="0.0" oninput="dq('un')" min="0"/>
-          <div class="ti-tag">wsUSD</div></div></div>
-        <div class="quote-box"><div class="qb-label">Получите</div>
-          <div class="qb-val" id="un-quote">—</div><div class="qb-sub" id="un-sub"></div></div>
-        <button class="btn-action red" id="btn-unstake" onclick="doUnstake()" disabled>Забрать</button>
+        <div class="note">Staking grants a share of the fee flow. Base BSKUSD does not appreciate.</div>
       </div>
     </div>
 
-    <div id="pnl-admin" style="display:none">
-      <div class="card-title">Состояние</div>
-      <div id="adm-state"></div>
-      <div id="adm-bootstrap" style="display:none">
-        <div class="divider">запуск пула</div>
-        <div class="warn">bootstrap спишет стартовые суммы с вашего адреса и выпустит начальный сапплай. Сначала выдайте approve по каждому токену на адрес пула. Вызывается один раз.</div>
-        <button class="btn-action amber" onclick="admCall('bootstrap',[])">Запустить пул</button>
-      </div>
-      <div class="divider">пауза слота</div>
-      <div class="note">Пауза перекрывает только приток. Выходы работают всегда. Ставит guardian или админ, снимает только админ.</div>
-      <div class="g2" id="adm-pause"></div>
-      <div class="divider">guardian</div>
-      <input class="adm-inp" id="adm-guardian" placeholder="0x… адрес guardian"/>
-      <button class="btn-sm" style="width:100%" onclick="admCall('set_guardian',[val('adm-guardian')])">Назначить</button>
-      <div class="divider">добавить пятый актив</div>
-      <div id="adm-add-pending"></div>
-      <div class="note" id="adm-nexta"></div>
-      <input class="adm-inp" id="adm-nt-addr" placeholder="0x… адрес нового токена"/>
-      <input class="adm-inp" id="adm-nt-amt" placeholder="сумма в сырых единицах"/>
-      <div class="g3">
-        <button class="btn-sm" onclick="admCall('schedule_add_token',[val('adm-nt-addr'),val('adm-nt-amt')])">Объявить</button>
-        <button class="btn-sm" onclick="admCall('execute_add_token',[0])">Исполнить</button>
-        <button class="btn-sm danger" onclick="admCall('cancel_add_token',[])">Отменить</button>
-      </div>
-      <div class="note">Уведомление 30 дней, окно 14. A пересчитается сам и упадёт примерно в двенадцать раз. Токены спишутся в момент исполнения — заранее выдайте approve.</div>
-      <div class="divider">замена мёртвого слота</div>
-      <div id="adm-rot-state"></div>
-      <input class="adm-inp" id="adm-rot-slot" placeholder="номер слота"/>
-      <input class="adm-inp" id="adm-rot-token" placeholder="0x… токен на замену"/>
-      <input class="adm-inp" id="adm-rot-amt" placeholder="эскроу в сырых единицах"/>
-      <div class="g3">
-        <button class="btn-sm" onclick="admCall('fund_rotation',[val('adm-rot-slot'),val('adm-rot-token'),val('adm-rot-amt')])">Эскроу</button>
-        <button class="btn-sm" onclick="admCall('schedule_rotation',[val('adm-rot-slot')])">Объявить</button>
-        <button class="btn-sm" onclick="admCall('execute_rotation',[val('adm-rot-slot')])">Исполнить</button>
-      </div>
-      <div class="g2" style="margin-top:6px">
-        <button class="btn-sm danger" onclick="admCall('cancel_rotation',[val('adm-rot-slot')])">Отменить</button>
-        <button class="btn-sm" onclick="admCall('reclaim_rotation',[val('adm-rot-slot')])">Забрать эскроу</button>
-      </div>
-      <div class="note">Порядок: пауза → выдержка 7 дней → эскроу → анонс 30 дней → окно 14. Эскроу вносит и исполняет кто угодно.</div>
-      <div class="divider">параметр кривой A</div>
-      <div id="adm-a-pending"></div>
-      <input class="adm-inp" id="adm-newa" placeholder="новое A"/>
-      <div class="g3">
-        <button class="btn-sm" onclick="admCall('schedule_a_change',[val('adm-newa')])">Объявить</button>
-        <button class="btn-sm" onclick="admCall('apply_a_change',[])">Применить</button>
-        <button class="btn-sm danger" onclick="admCall('cancel_a_change',[])">Отменить</button>
-      </div>
-      <div class="note">Шаг не более чем вдвое, не чаще раза в неделю. Уведомление 24 часа, окно 48. Применение требует сбалансированного пула. Заявка аннулируется при добавлении актива.</div>
-      <div class="divider">комиссии: вход, обмен, выход</div>
-      <div id="adm-fees-now"></div>
-      <div id="adm-fees-pending"></div>
-      <div class="g3">
-        <input class="adm-inp" id="adm-fee-mint" placeholder="вход"/>
-        <input class="adm-inp" id="adm-fee-swap" placeholder="обмен"/>
-        <input class="adm-inp" id="adm-fee-burn" placeholder="выход"/>
-      </div>
-      <div class="g3">
-        <button class="btn-sm" onclick="admCall('schedule_fees',[val('adm-fee-mint'),val('adm-fee-swap'),val('adm-fee-burn')])">Объявить</button>
-        <button class="btn-sm" onclick="admCall('apply_fees',[])">Применить</button>
-        <button class="btn-sm danger" onclick="admCall('cancel_fees',[])">Отменить</button>
-      </div>
-      <div class="note" id="adm-fee-note"></div>
-
-      <div class="divider">раздел комиссии между казной и стейкерами</div>
-      <div id="adm-split-pending"></div>
-      <input class="adm-inp" id="adm-wsusd" placeholder="0x… адрес вейла wsUSD"/>
-      <input class="adm-inp" id="adm-tbp" placeholder="доля КАЗНЫ в б.п., 5000 = поровну"/>
-      <button class="btn-sm" style="width:100%;margin-bottom:6px" onclick="admCall('set_wsUSD',[val('adm-wsusd'),val('adm-tbp')])">Задать вейл и долю (однократно)</button>
-      <div class="warn">set_wsUSD срабатывает мгновенно и без уведомления — единственный вызов, способный сдвинуть поток комиссии сразу. Объявляйте целевую долю публично до вызова.</div>
-      <div class="g3">
-        <button class="btn-sm" onclick="admCall('schedule_split',[val('adm-tbp')])">Объявить долю</button>
-        <button class="btn-sm" onclick="admCall('apply_split',[])">Применить</button>
-        <button class="btn-sm danger" onclick="admCall('cancel_split',[])">Отменить</button>
-      </div>
-      <div class="note">Коридор 500–9500, шаг не более 1000 за раз, уведомление 7 дней. К 100% в казну вернуться нельзя.</div>
-      <div class="divider">смена вейла</div>
-      <input class="adm-inp" id="adm-newws" placeholder="0x… новый вейл"/>
-      <div class="g3">
-        <button class="btn-sm" onclick="admCall('schedule_wsUSD_change',[val('adm-newws')])">Объявить</button>
-        <button class="btn-sm" onclick="admCall('apply_wsUSD_change',[])">Применить</button>
-        <button class="btn-sm danger" onclick="admCall('cancel_wsUSD_change',[])">Отменить</button>
-      </div>
-      <div class="divider">передача администрирования</div>
-      <input class="adm-inp" id="adm-newadmin" placeholder="0x… новый админ"/>
-      <div class="g2">
-        <button class="btn-sm" onclick="admCall('propose_admin',[val('adm-newadmin')])">Предложить</button>
-        <button class="btn-sm" onclick="admCall('accept_admin',[])">Принять</button>
-      </div>
-      <div class="note">Двухшаговая: пока новый адрес не подтвердил, права остаются у текущего.</div>
-    </div>
+    <!-- ---------- admin ---------- -->
+    <div id="pnl-admin" style="display:none"></div>
   </div>
 </div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
 <script>
+/* ============================ configuration ============================ */
 const POOL_ADDR = "0xc79978CEE433babd0Bb19B4469c5508888897ED7"
 const CHAIN_ID  = 11155111
 const RPC_URL   = "https://ethereum-sepolia.publicnode.com"
 const EXPLORER  = "https://sepolia.etherscan.io"
-const MAX_COINS = 5
-const BARS = ["#7c6ff7","#1fd18a","#5b8af7","#f5a623","#f06060"]
+const NET_NAME  = "Sepolia"
+const MAX_COINS = 6
+const BARS = ["#7c6ff7","#1fd18a","#5b8af7","#f5a623","#f06060","#a89af7"]
 
+/* ABI generated from bskUSD v5.9.0 — do not hand-edit */
 const POOL_ABI = [
- "function totalSupply() view returns (uint256)",
- "function balanceOf(address) view returns (uint256)",
- "function n_coins() view returns (uint256)",
- "function xp(uint256) view returns (uint256)",
- "function tokens(uint256) view returns (address)",
- "function token_decimals(uint256) view returns (uint8)",
- "function paused(uint256) view returns (bool)",
- "function A() view returns (uint256)",
- "function current_cap_bp() view returns (uint256)",
- "function next_a_preview() view returns (uint256)",
- "function initialized() view returns (bool)",
- "function admin() view returns (address)",
- "function guardian() view returns (address)",
- "function treasury() view returns (address)",
- "function wsUSD() view returns (address)",
- "function treasury_bp() view returns (uint256)",
- "function FEE_MAX_BP() view returns (uint256)",
- "function FEE_DELAY() view returns (uint256)",
- "function FEE_WINDOW() view returns (uint256)",
- "function fees() view returns (uint256,uint256,uint256)",
- "function pending_fees() view returns (uint256,uint256,uint256,uint256)",
- "function pending_fee_eta() view returns (uint256)",
- "function schedule_fees(uint256,uint256,uint256)",
- "function apply_fees()",
- "function cancel_fees()",
- "function MIN_DELIVERED_BP() view returns (uint256)",
- "function get_state() view returns (uint256[5],uint256,uint256,uint256,uint256,uint256)",
- "function quote_mint_net(uint256,uint256) view returns (uint256)",
- "function quote_mint_proportional(uint256) view returns (uint256,uint256[5])",
- "function quote_burn(uint256,uint256) view returns (uint256)",
- "function quote_burn_each(uint256) view returns (uint256[5])",
- "function quote_burn_proportional(uint256) view returns (uint256[5])",
- "function get_dy(uint256,uint256,uint256) view returns (uint256)",
- "function mint(uint256,uint256,uint256) returns (uint256)",
- "function mint_proportional(uint256[5],uint256) returns (uint256)",
- "function burn(uint256,uint256,uint256) returns (uint256)",
- "function burn_proportional(uint256,uint256[5],bool[5]) returns (uint256[5])",
- "function exchange(uint256,uint256,uint256,uint256) returns (uint256)",
- "function pending_token() view returns (address)",
- "function pending_token_amt() view returns (uint256)",
- "function pending_token_eta() view returns (uint256)",
- "function pending_a() view returns (uint256)",
- "function pending_a_eta() view returns (uint256)",
- "function pending_treasury_bp() view returns (uint256)",
- "function pending_split_eta() view returns (uint256)",
- "function pending_wsUSD() view returns (address)",
- "function pending_wsUSD_eta() view returns (uint256)",
- "function rot_token(uint256) view returns (address)",
- "function rot_amount(uint256) view returns (uint256)",
- "function rot_funder(uint256) view returns (address)",
- "function rot_eta(uint256) view returns (uint256)",
- "function bootstrap()","function set_guardian(address)",
- "function pause_token(uint256)","function unpause_token(uint256)",
- "function schedule_add_token(address,uint256)",
- "function execute_add_token(uint256) returns (uint256)",
- "function cancel_add_token()",
- "function fund_rotation(uint256,address,uint256)",
- "function schedule_rotation(uint256)","function execute_rotation(uint256)",
- "function cancel_rotation(uint256)","function reclaim_rotation(uint256)",
- "function schedule_a_change(uint256)","function apply_a_change()","function cancel_a_change()",
- "function set_wsUSD(address,uint256)",
- "function schedule_split(uint256)","function apply_split()","function cancel_split()",
- "function schedule_wsUSD_change(address)","function apply_wsUSD_change()","function cancel_wsUSD_change()",
- "function propose_admin(address)","function accept_admin()",
-]
-const WSUSD_ABI = [
- "function totalAssets() view returns (uint256)",
- "function totalSupply() view returns (uint256)",
- "function balanceOf(address) view returns (uint256)",
- "function convertToAssets(uint256) view returns (uint256)",
- "function previewDeposit(uint256) view returns (uint256)",
- "function previewRedeem(uint256) view returns (uint256)",
- "function deposit(uint256,address) returns (uint256)",
- "function redeem(uint256,address,address) returns (uint256)",
+  "function name() view returns (string)",
+  "function symbol() view returns (string)",
+  "function decimals() view returns (uint8)",
+  "function totalSupply() view returns (uint256)",
+  "function balanceOf(address) view returns (uint256)",
+  "function allowance(address,address) view returns (uint256)",
+  "function approve(address,uint256) returns (bool)",
+  "function transfer(address,uint256) returns (bool)",
+
+  "function n_coins() view returns (uint256)",
+  "function coins(uint256) view returns (address)",
+  "function balances(uint256) view returns (uint256)",
+  "function xp(uint256) view returns (uint256)",
+  "function mul(uint256) view returns (uint256)",
+  "function token_decimals(uint256) view returns (uint8)",
+  "function paused(uint256) view returns (bool)",
+  "function paused_since(uint256) view returns (uint256)",
+  "function initialized() view returns (bool)",
+  "function get_state() view returns (uint256[6],uint256,uint256,uint256,uint256,uint256)",
+  "function get_virtual_price() view returns (uint256)",
+  "function current_cap_bp() view returns (uint256)",
+
+  "function ann() view returns (uint256)",
+  "function A() view returns (uint256)",
+  "function MIN_ANN() view returns (uint256)",
+  "function MAX_ANN() view returns (uint256)",
+  "function MAX_COINS() view returns (uint256)",
+  "function FLOOR_BP() view returns (uint256)",
+  "function CAP_NUMERATOR() view returns (uint256)",
+  "function CAP_MAX_BP() view returns (uint256)",
+  "function MIN_DELIVERED_BP() view returns (uint256)",
+  "function FEE_MAX_BP() view returns (uint256)",
+  "function DELAY() view returns (uint256)",
+  "function WINDOW() view returns (uint256)",
+  "function ANN_TIMELOCK() view returns (uint256)",
+  "function ANN_WINDOW() view returns (uint256)",
+  "function ANN_MIN_SPACING() view returns (uint256)",
+  "function PAUSE_MIN_AGE() view returns (uint256)",
+  "function RECLAIM_AFTER() view returns (uint256)",
+  "function MIN_TREASURY_BP() view returns (uint256)",
+  "function MAX_TREASURY_BP() view returns (uint256)",
+  "function MAX_SPLIT_STEP_BP() view returns (uint256)",
+
+  "function admin() view returns (address)",
+  "function pending_admin() view returns (address)",
+  "function pauser() view returns (address)",
+  "function treasury() view returns (address)",
+  "function staking_vault() view returns (address)",
+  "function treasury_bp() view returns (uint256)",
+
+  "function fees() view returns (uint256,uint256,uint256)",
+  "function pending_fees() view returns (uint256,uint256,uint256,uint256)",
+  "function pending_fee_eta() view returns (uint256)",
+  "function pending_ann() view returns (uint256)",
+  "function pending_ann_eta() view returns (uint256)",
+  "function last_ann_change() view returns (uint256)",
+  "function pending_token() view returns (address)",
+  "function pending_token_amt() view returns (uint256)",
+  "function pending_token_eta() view returns (uint256)",
+  "function pending_treasury_bp() view returns (uint256)",
+  "function pending_split_eta() view returns (uint256)",
+  "function rot_token(uint256) view returns (address)",
+  "function rot_amount(uint256) view returns (uint256)",
+  "function rot_funder(uint256) view returns (address)",
+  "function rot_eta(uint256) view returns (uint256)",
+  "function claimable(address,address) view returns (uint256)",
+
+  "function quote_mint_net(uint256,uint256) view returns (uint256)",
+  "function quote_mint_proportional(uint256) view returns (uint256,uint256[6])",
+  "function quote_burn(uint256,uint256) view returns (uint256)",
+  "function quote_burn_each(uint256) view returns (uint256[6])",
+  "function quote_burn_proportional(uint256) view returns (uint256[6])",
+  "function get_dy(int128,int128,uint256) view returns (uint256)",
+
+  "function mint(uint256,uint256,uint256) returns (uint256)",
+  "function mint_proportional(uint256[6],uint256) returns (uint256)",
+  "function burn(uint256,uint256,uint256) returns (uint256)",
+  "function burn_proportional(uint256,uint256[6]) returns (uint256[6])",
+  "function exchange(int128,int128,uint256,uint256) returns (uint256)",
+  "function claim(address)",
+
+  "function bootstrap()",
+  "function pause_token(uint256)",
+  "function unpause_token(uint256)",
+  "function set_pauser(address)",
+  "function schedule_fees(uint256,uint256,uint256)",
+  "function apply_fees()",
+  "function cancel_fees()",
+  "function schedule_ann_change(uint256)",
+  "function apply_ann_change()",
+  "function cancel_ann_change()",
+  "function schedule_add_token(address,uint256)",
+  "function execute_add_token(uint256) returns (uint256)",
+  "function cancel_add_token()",
+  "function fund_rotation(uint256,address,uint256)",
+  "function schedule_rotation(uint256)",
+  "function execute_rotation(uint256)",
+  "function cancel_rotation(uint256)",
+  "function reclaim_rotation(uint256)",
+  "function schedule_split(uint256)",
+  "function apply_split()",
+  "function cancel_split()",
+  "function set_staking_vault(address,uint256)",
+  "function propose_admin(address)",
+  "function accept_admin()"
 ]
 const ERC20_ABI = [
- "function balanceOf(address) view returns (uint256)",
- "function approve(address,uint256) returns (bool)",
- "function allowance(address,address) view returns (uint256)",
- "function symbol() view returns (string)",
+  "function balanceOf(address) view returns (uint256)",
+  "function allowance(address,address) view returns (uint256)",
+  "function approve(address,uint256) returns (bool)",
+  "function decimals() view returns (uint8)",
+  "function symbol() view returns (string)"
 ]
 
-let provider, signer, pool, userAddr, isAdmin=false
-let wsusd=null, wsAddr=null
-let slip={sw:0.1,mt:0.1,bn:0.1}
-let burnSel=0, timers={}, forfeit=[false,false,false,false,false]
-let N=0, TKN=[], NAMES=[], DEC=[]
-let snap=null, selSlot=-1
-// Комиссии больше не константа: три значения читаются с контракта и
-// могут измениться по таймлоку. Держим последнее прочитанное, чтобы
-// подписи под котировками не врали.
-let FEE = {mint:null, swap:null, burn:null}
+/* ============================ state ============================ */
+const rpc   = new ethers.providers.JsonRpcProvider(RPC_URL)
+let poolRO  = new ethers.Contract(POOL_ADDR, POOL_ABI, rpc)
+let provider = null, signer = null, pool = null, account = null
+let isAdmin = false, isPauser = false
+let snap = null              // { n, names, addrs, decs, xp[], raw[], D, supply, ann, cap, paused[] }
+let FEE  = { mint:null, swap:null, burn:null }
+let slip = 0.001             // 0.1 %
+let selSlot = -1, propMode = 'in'
+let rawBal = {}              // token symbol -> BigNumber of the connected wallet
+let prices = {}
+const burnCapCache = {}      // slot -> { amount: BigNumber, atD: string }
 
-// Сроки таймлока комиссий читаются с контракта, а не пишутся здесь: в
-// тестовой сети они укорочены до часа, в мейннете должны быть 7 и 14 дней.
-let FEE_TIMES = {delay:0, window:0}
+/* ============================ helpers ============================ */
+const $ = id => document.getElementById(id)
+const BN = ethers.BigNumber
+const ZERO = ethers.constants.AddressZero
 
-function fmtDur(sec){
-  if(!sec) return '—'
-  if(sec >= 86400) return Math.round(sec/86400)+' д'
-  if(sec >= 3600)  return Math.round(sec/3600)+' ч'
-  return Math.round(sec/60)+' мин'
+function num(x, d = 2){
+  if (x === null || x === undefined || Number.isNaN(x)) return '—'
+  const n = Number(x)
+  if (n !== 0 && Math.abs(n) < 0.0001) return n.toExponential(2)
+  return n.toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d })
 }
-const bp = v => v===null ? '—' : (v/100).toFixed(2)+'%'
-
-const rpc = new ethers.providers.JsonRpcProvider(RPC_URL)
-const poolRO = new ethers.Contract(POOL_ADDR, POOL_ABI, rpc)
-
-// ---------- кеш ----------
-// localStorage бросает исключение в приватном режиме и в песочнице iframe.
-// Без обёртки страница там просто не запустится, поэтому есть запасной
-// вариант в памяти: кеш перестаёт переживать перезагрузку, но ничего не ломает.
-const mem = new Map()
-const store = {
-  get(k){ try{ const v=localStorage.getItem(k); return v===null?mem.get(k):v }catch(e){ return mem.get(k) } },
-  set(k,v){ mem.set(k,v); try{ localStorage.setItem(k,v) }catch(e){} }
+const fmtU = (bn, dec, d = 4) => num(Number(ethers.utils.formatUnits(bn, dec)), d)
+function parseU(str, dec){
+  const t = String(str ?? '').trim().replace(',', '.')
+  if (!t || Number(t) <= 0 || !Number.isFinite(Number(t))) return null
+  try { return ethers.utils.parseUnits(t, dec) } catch { return null }
 }
-const ckey = (what,who)=>`bskusd:${CHAIN_ID}:${POOL_ADDR.toLowerCase()}:${what}${who?':'+who.toLowerCase():''}`
-function cacheSave(what,obj,who){ store.set(ckey(what,who), JSON.stringify({t:Date.now(),d:obj})) }
-function cacheLoad(what,who){
-  const raw=store.get(ckey(what,who)); if(!raw) return null
-  try{ const {t,d}=JSON.parse(raw); return {age:Math.floor((Date.now()-t)/1000), data:d} }catch(e){ return null }
+const bp = v => (Number(v) / 100).toFixed(2) + ' %'
+const shortAddr = a => a ? a.slice(0, 6) + '…' + a.slice(-4) : ''
+function days(sec){
+  const s = Number(sec)
+  if (s % 86400 === 0) return (s / 86400) + (s === 86400 ? ' day' : ' days')
+  if (s % 3600 === 0)  return (s / 3600)  + (s === 3600  ? ' hour' : ' hours')
+  return s + ' s'
 }
-function ago(s){
-  if(s<60) return 'только что'
-  if(s<3600) return Math.floor(s/60)+' мин назад'
-  if(s<86400) return Math.floor(s/3600)+' ч назад'
-  return Math.floor(s/86400)+' д назад'
-}
-// Показанное из кеша приглушается: цифра могла устареть, и выдавать её
-// за текущую нельзя.
-function stale(ids,on){ ids.forEach(id=>{const e=document.getElementById(id); if(e) e.classList.toggle('stale',!!on)}) }
-
-function toggleCollapse(k){
-  const b=document.getElementById('body-'+k), c=document.getElementById('chev-'+k)
-  const open=b.classList.toggle('open'); c.classList.toggle('open',open)
-  store.set('bskusd:ui:'+k, open?'1':'0')
-}
-
-// ---------- утилиты ----------
-const val = id => document.getElementById(id).value.trim()
-const short = a => a.slice(0,6)+'…'+a.slice(-4)
-const num = n => Number(n).toLocaleString('ru',{maximumFractionDigits:2})
-function fmt(bn,dec,dp){
-  const n=parseFloat(ethers.utils.formatUnits(bn,dec)); dp=dp??(dec===18?4:2)
-  if(n>=1e6) return (n/1e6).toFixed(2)+'M'
-  if(n>=1e3) return (n/1e3).toFixed(2)+'K'
-  return n.toFixed(dp)
-}
-function parseAmt(v,dec){ try{ return ethers.utils.parseUnits(String(parseFloat(v)),dec) }catch{ return null } }
-function minOut(bn,pct){ return bn.mul(Math.floor((1-pct/100)*10000)).div(10000) }
-function setStatus(m,t){
-  const e=document.getElementById('status-msg'); e.textContent=m; e.className='status '+t
-  if(t!=='info') setTimeout(()=>{ if(e.textContent===m) e.className='status' },12000)
-}
-function clearStatus(){ document.getElementById('status-msg').className='status' }
 function eta(ts){
-  if(!ts||ts.eq(0)) return null
-  const t=ts.toNumber(), d=t-Math.floor(Date.now()/1000)
-  const when=new Date(t*1000).toLocaleString('ru')
-  if(d>0){ const dd=Math.floor(d/86400), hh=Math.floor((d%86400)/3600)
-    return {when, left: dd>0?`через ${dd} д ${hh} ч`:`через ${hh} ч`} }
-  return {when, left:'срок наступил'}
+  const t = Number(ts); if (!t) return '—'
+  const left = t * 1000 - Date.now()
+  if (left <= 0) return 'ready'
+  const h = Math.floor(left / 3600000)
+  return h >= 24 ? Math.floor(h / 24) + 'd ' + (h % 24) + 'h' : h + 'h'
+}
+function setStatus(msg, kind){
+  const el = $('status-msg')
+  el.className = 'status show ' + (kind || 'info')
+  el.textContent = msg
+  if (kind === 'success') setTimeout(() => el.classList.remove('show'), 9000)
 }
 function errText(e){
-  const raw = e?.reason||e?.error?.message||e?.data?.message||e?.message||String(e)
-  if(/user rejected|user denied/i.test(raw)) return 'Транзакция отклонена в кошельке.'
-  if(/insufficient funds/i.test(raw)) return 'Не хватает ETH на газ.'
-  // контракт отдаёт Err(uint256); селектор не попадает в ABI, поэтому
-  // библиотека покажет сырые байты — переводим в понятное
-  if(/execution reverted|CALL_EXCEPTION/i.test(raw))
-    return 'Контракт отклонил операцию. Частые причины: проскальзывание больше допуска, потолок доли, пол слота, приостановленный актив, слишком малая сумма.'
-  return raw
+  const m = e?.error?.message || e?.data?.message || e?.reason || e?.message || String(e)
+  const code = m.match(/0x39eabce6([0-9a-f]{64})/i)
+  if (code) return 'rejected by the contract, code ' + parseInt(code[1], 16)
+  if (/user rejected|ACTION_REJECTED/i.test(m)) return 'cancelled in the wallet'
+  return m.length > 160 ? m.slice(0, 160) + '…' : m
+}
+function why(id, text){
+  const el = $('why-' + id)
+  if (!el) return
+  el.textContent = text || ''
+  el.classList.toggle('show', !!text)
+}
+function lock(btnId, disabled){ const b = $(btnId); if (b) b.disabled = disabled }
+
+/* ============================ wallet ============================ */
+async function connectWallet(){
+  if (!window.ethereum){ setStatus('No wallet found in this browser.', 'error'); return }
+  try{
+    provider = new ethers.providers.Web3Provider(window.ethereum, 'any')
+    await provider.send('eth_requestAccounts', [])
+    const net = await provider.getNetwork()
+    if (net.chainId !== CHAIN_ID){
+      try{
+        await window.ethereum.request({ method: 'wallet_switchEthereumChain',
+          params: [{ chainId: '0x' + CHAIN_ID.toString(16) }] })
+      }catch{ setStatus('Switch the wallet to ' + NET_NAME + '.', 'error'); return }
+    }
+    signer  = provider.getSigner()
+    account = await signer.getAddress()
+    pool    = new ethers.Contract(POOL_ADDR, POOL_ABI, signer)
+    $('btn-wallet').textContent = 'Connected'
+    $('btn-wallet').classList.add('connected')
+    $('addr-display').textContent = shortAddr(account)
+    const [adm, psr] = await Promise.all([poolRO.admin(), poolRO.pauser()])
+    isAdmin  = adm.toLowerCase() === account.toLowerCase()
+    isPauser = psr.toLowerCase() === account.toLowerCase()
+    if (isAdmin || isPauser){
+      $('admin-pill').style.display = 'inline-block'
+      $('admin-pill').textContent = isAdmin ? 'Admin' : 'Pauser'
+    }
+    await loadAll()
+  }catch(e){ setStatus('Connection failed: ' + errText(e), 'error') }
+}
+$('btn-wallet').onclick = connectWallet
+
+/* ============================ transactions ============================ */
+/* One place sends every transaction, so one place clears the inputs. */
+async function tx(label, build, opts){
+  opts = opts || {}
+  if (!signer){ setStatus('Connect your wallet first.', 'error'); return false }
+  try{
+    setStatus(label + ' — confirm in your wallet…', 'info')
+    const sent = await build()
+    setStatus(label + ' — pending…', 'info')
+    const rc = await sent.wait()
+    setStatus(label + ' confirmed · ' + rc.transactionHash.slice(0, 12) + '…', 'success')
+    ;(opts.clear || []).forEach(id => { const el = $(id); if (el) el.value = '' })
+    Object.keys(burnCapCache).forEach(k => delete burnCapCache[k])
+    await loadAll()
+    ;(opts.after || []).forEach(fn => { try { fn() } catch {} })
+    return true
+  }catch(e){
+    setStatus(label + ' failed: ' + errText(e), 'error')
+    return false
+  }
 }
 
-// ---------- герой ----------
-function renderHero(s, isStale){
-  if(!s) return
-  document.getElementById('hero-tvl').textContent    = num(s.totalN)
-  document.getElementById('hero-supply').textContent = num(s.supplyN)
-  document.getElementById('hero-d').textContent      = num(s.dN)
-  document.getElementById('hero-a').textContent      = s.A
-  document.getElementById('hero-cap').textContent    = (s.cap/100)+'%'
-  document.getElementById('hero-n').textContent      = s.n+' из '+MAX_COINS
+async function ensureAllowance(tokenAddr, amount, label){
+  const erc = new ethers.Contract(tokenAddr, ERC20_ABI, signer)
+  const cur = await erc.allowance(account, POOL_ADDR)
+  if (cur.gte(amount)) return true
+  return await tx('Approve ' + label, () => erc.approve(POOL_ADDR, ethers.constants.MaxUint256))
+}
 
-  // virtual price: D/supply. Должен быть ровно 1 — отклонение вниз
-  // означает, что выпущено больше, чем обеспечено.
-  const vp = s.supplyN>0 ? s.dN/s.supplyN : 1
-  document.getElementById('hero-vp').textContent = vp.toFixed(6)
-  document.getElementById('hm-vp').classList.toggle('warn', vp < 0.999999)
+/* ============================ loading ============================ */
+async function loadBasket(){
+  const p = pool || poolRO
+  const n = (await p.n_coins()).toNumber()
+  const addrs = [], names = [], decs = [], paused = []
+  for (let i = 0; i < n; i++){
+    const a = await p.coins(i)
+    addrs.push(a)
+    decs.push((await p.token_decimals(i)))
+    paused.push(await p.paused(i))
+    try { names.push(await new ethers.Contract(a, ERC20_ABI, rpc).symbol()) }
+    catch { names.push('SLOT ' + i) }
+  }
+  snap = Object.assign(snap || {}, { n, addrs, names, decs, paused })
+  buildSelectors()
+}
 
-  const capPct = s.cap/100
-  document.getElementById('stack').innerHTML = s.xp.map((x,i)=>{
-    const pct = s.totalN>0 ? x/s.totalN*100 : 0
-    // подпись внутри сегмента только если он достаточно широк, иначе
-    // текст обрежется и станет мусором: сумма — во всплывающей подсказке
-    // и всегда в легенде под шкалой
-    const lbl = pct>16 ? `${s.names[i]} ${num(x)}` : (pct>8 ? s.names[i] : '')
-    return `<div class="seg${s.paused[i]?' paused':''}${i===selSlot?' active':''}"
+async function loadStats(){
+  const p = pool || poolRO
+  const [st, ann, cap, init] = await Promise.all([
+    p.get_state(), p.ann(), p.current_cap_bp(), p.initialized()
+  ])
+  const n = st[5].toNumber()
+  const xp = st[0].slice(0, n).map(v => Number(ethers.utils.formatUnits(v, 18)))
+  const raw = []
+  for (let i = 0; i < n; i++) raw.push(await p.balances(i))
+  snap = Object.assign(snap || {}, {
+    n, xp, raw,
+    D: Number(ethers.utils.formatUnits(st[1], 18)),
+    supply: Number(ethers.utils.formatUnits(st[2], 18)),
+    annRaw: st[3], ann: Number(ann), cap: cap.toNumber(), initialized: init,
+    total: xp.reduce((a, b) => a + b, 0)
+  })
+  renderHero(); renderStack(); renderLegend()
+  if (selSlot >= 0) renderSlot(selSlot)
+}
+
+async function loadBalances(){
+  if (!account){ $('bal-grid').innerHTML =
+    '<div class="note" style="grid-column:span 2">Connect a wallet to see your balances.</div>'; return }
+  const rows = []
+  rawBal = {}
+  for (let i = 0; i < snap.n; i++){
+    const erc = new ethers.Contract(snap.addrs[i], ERC20_ABI, rpc)
+    const b = await erc.balanceOf(account)
+    rawBal[snap.names[i]] = b
+    rows.push(`<div class="bal-item"><div class="bal-dot" style="background:${BARS[i]}"></div>
+      <div><div class="bal-name">${snap.names[i]}</div>
+      <div class="bal-val">${fmtU(b, snap.decs[i])}</div></div></div>`)
+  }
+  const bsk = await (pool || poolRO).balanceOf(account)
+  rawBal.BSKUSD = bsk
+  rows.push(`<div class="bal-item" style="grid-column:span 2">
+    <div class="bal-dot" style="background:#fff"></div>
+    <div><div class="bal-name">BSKUSD</div>
+    <div class="bal-val">${fmtU(bsk, 18)}</div></div></div>`)
+  $('bal-grid').innerHTML = rows.join('')
+  $('bal-age').textContent = 'Updated ' + new Date().toLocaleTimeString('en-GB')
+}
+
+async function loadFeeRates(){
+  const [m, s, b] = await (pool || poolRO).fees()
+  FEE = { mint: m.toNumber(), swap: s.toNumber(), burn: b.toNumber() }
+  $('fee-rates').innerHTML = `<div class="fee3">
+    <div class="f3"><div class="f3-k">Deposit</div><div class="f3-v">${bp(FEE.mint)}</div></div>
+    <div class="f3"><div class="f3-k">Swap</div><div class="f3-v">${bp(FEE.swap)}</div></div>
+    <div class="f3"><div class="f3-k">Withdraw</div><div class="f3-v">${bp(FEE.burn)}</div></div></div>`
+    + (FEE.swap > FEE.mint + FEE.burn
+      ? `<div class="warn">A swap costs more than a deposit plus a withdrawal
+         (${bp(FEE.swap)} against ${bp(FEE.mint + FEE.burn)}). The same result is cheaper in two
+         steps: deposit into one slot and withdraw from another.</div>` : '')
+  renderSlipRows()
+}
+
+async function loadFeeSplit(){
+  const p = pool || poolRO
+  const [vault, tbp, tre] = await Promise.all([p.staking_vault(), p.treasury_bp(), p.treasury()])
+  const live = vault !== ZERO
+  $('fd-treasury').textContent = (Number(tbp) / 100).toFixed(0) + ' %'
+  $('fd-vault').textContent = live ? (100 - Number(tbp) / 100).toFixed(0) + ' %' : '0 %'
+  $('fd-note').innerHTML = live
+    ? `Treasury <span class="addr-mono">${shortAddr(tre)}</span>, vault
+       <span class="addr-mono">${shortAddr(vault)}</span>.`
+    : `The vault is not connected, so the entire fee goes to the treasury
+       <span class="addr-mono">${shortAddr(tre)}</span>.`
+  $('stake-off').style.display = live ? 'none' : 'block'
+  $('stake-on').style.display  = live ? 'block' : 'none'
+}
+
+async function loadLimits(){
+  const p = pool || poolRO
+  const minDel = await p.MIN_DELIVERED_BP()
+  if (!snap || !snap.D) return
+  const capF = snap.cap / 10000
+  const rows = [
+    ['Floor Of Each Slot', num(snap.D / snap.n * 0.005) + ' — cannot go below'],
+    ['Minimum Basket Delivery', 'at least ' + (Number(minDel) / 100) + ' % of what is owed'],
+  ]
+  const maxIn = snap.xp.map(x => { const m = (capF * snap.total - x) / (1 - capF); return m > 0 ? m : 0 })
+  rows.push(['Maximum Single-Asset Deposit',
+    maxIn.map((m, i) => `${snap.names[i]} ${num(m, 0)}`).join(' · ')])
+  const each = await p.quote_burn_each(ethers.utils.parseUnits('1', 18)).catch(() => null)
+  rows.push(['Maximum Single-Asset Withdrawal', 'per asset — see the Withdraw tab'])
+  $('limits').innerHTML = rows.map(([k, v]) =>
+    `<div class="kv"><span class="kv-k">${k}</span><span class="kv-v">${v}</span></div>`).join('')
+    + `<div class="note">A deposit beyond the figures above runs into the share cap. The Basket tab
+       has no cap at all — a proportional deposit does not move any share.</div>`
+}
+
+async function loadTech(){
+  const p = pool || poolRO
+  const [annV, curveA, vp, capN, capMax, floorBp, feeMax,
+         delay, win, annTl, annWin, annSp, pauseAge, minAnn, maxAnn] = await Promise.all([
+    p.ann(), p.A(), p.get_virtual_price().catch(() => null), p.CAP_NUMERATOR(), p.CAP_MAX_BP(),
+    p.FLOOR_BP(), p.FEE_MAX_BP(), p.DELAY(), p.WINDOW(), p.ANN_TIMELOCK(), p.ANN_WINDOW(),
+    p.ANN_MIN_SPACING(), p.PAUSE_MIN_AGE(), p.MIN_ANN(), p.MAX_ANN()
+  ])
+  const rows = [
+    ['Invariant D', num(snap ? snap.D : 0)],
+    ['Virtual Price', vp ? Number(ethers.utils.formatUnits(vp, 18)).toFixed(6) : '—'],
+    ['Amplification (ann)', Number(annV).toLocaleString('en-US')],
+    ['Amplification In Curve Units', Number(curveA).toLocaleString('en-US')],
+    ['Amplification Bounds', Number(minAnn).toLocaleString('en-US') + ' … ' + Number(maxAnn).toLocaleString('en-US')],
+    ['Share Cap Formula', `min(${capN}/n, ${Number(capMax) / 100} %) = ${snap ? (snap.cap / 100).toFixed(1) : '—'} %`],
+    ['Slot Floor', (Number(floorBp) / 100) + ' % of D/n'],
+    ['Fee Ceiling', bp(feeMax) + ' per operation'],
+    ['Governance Delay / Window', days(delay) + ' / ' + days(win)],
+    ['Amplification Delay / Window', days(annTl) + ' / ' + days(annWin)],
+    ['Minimum Spacing Between Amplification Steps', days(annSp)],
+    ['Minimum Pause Before Unpause', days(pauseAge)],
+    ['Pool Contract', `<span class="kv-v mono">${POOL_ADDR}</span>`],
+  ]
+  $('tech-list').innerHTML = rows.map(([k, v]) =>
+    `<div class="kv"><span class="kv-k">${k}</span><span class="kv-v">${v}</span></div>`).join('')
+}
+
+async function loadPending(){
+  const p = pool || poolRO
+  const out = []
+  const [fe, pf, ae, pa, te, pt, se, ps] = await Promise.all([
+    p.pending_fee_eta(), p.pending_fees(), p.pending_ann_eta(), p.pending_ann(),
+    p.pending_token_eta(), p.pending_token(), p.pending_split_eta(), p.pending_treasury_bp()
+  ])
+  if (Number(fe)) out.push(`Fees → ${pf[0]}/${pf[1]}/${pf[2]} bp · applies in ${eta(fe)}`)
+  if (Number(ae)) out.push(`Amplification → ${Number(pa).toLocaleString('en-US')} · applies in ${eta(ae)}`)
+  if (Number(te)) out.push(`New asset ${shortAddr(pt)} · applies in ${eta(te)}`)
+  if (Number(se)) out.push(`Treasury share → ${Number(ps) / 100} % · applies in ${eta(se)}`)
+  for (let i = 0; i < (snap?.n || 0); i++){
+    const re = await p.rot_eta(i)
+    if (Number(re)) out.push(`Rotation of slot ${i} (${snap.names[i]}) · applies in ${eta(re)}`)
+  }
+  $('card-pending').style.display = out.length ? 'block' : 'none'
+  $('pending-list').innerHTML = out.map(t => `<div class="pending">${t}</div>`).join('')
+}
+
+async function loadPrices(){
+  if (!snap) return
+  try{
+    const ids = { USDC:'usd-coin', USDT:'tether', DAI:'dai', PYUSD:'paypal-usd', USDS:'usds' }
+    const want = snap.names.map(n => ids[n]).filter(Boolean)
+    if (!want.length) return
+    const r = await fetch('https://api.coingecko.com/api/v3/simple/price?ids='
+      + want.join(',') + '&vs_currencies=usd')
+    const j = await r.json()
+    prices = {}
+    snap.names.forEach(n => { const id = ids[n]; if (id && j[id]) prices[n] = j[id].usd })
+    renderPrices()
+  }catch{ /* prices are decoration; never block the UI on them */ }
+}
+
+async function loadAll(){
+  await loadBasket()
+  await loadStats()
+  await Promise.all([loadBalances(), loadFeeRates(), loadFeeSplit(),
+                     loadLimits(), loadTech(), loadPending()])
+  renderAdmin()
+  requoteActive()
+}
+
+/* ============================ rendering ============================ */
+function renderHero(){
+  $('hero-tvl').textContent = '$' + num(snap.total)
+  $('hero-supply').textContent = num(snap.supply)
+  $('hero-n').textContent = snap.n
+  const backing = snap.supply > 0 ? snap.D / snap.supply : 1
+  $('hero-backing').textContent = (backing * 100).toFixed(2) + ' %'
+  $('hero-backing-wrap').classList.toggle('warn', backing < 1)
+}
+
+function renderStack(){
+  const tot = snap.total || 1
+  $('stack').innerHTML = snap.xp.map((v, i) => {
+    const pct = v / tot * 100
+    return `<div class="seg${snap.paused[i] ? ' paused' : ''}${i === selSlot ? ' active' : ''}"
       style="width:${pct}%;background:${BARS[i]}" onclick="selectSlot(${i})"
-      title="${s.names[i]} · ${num(x)} · ${pct.toFixed(1)}%"><span class="seg-lbl">${lbl}</span></div>`
+      title="${snap.names[i]} ${pct.toFixed(2)}%">
+      <span class="seg-lbl">${pct > 8 ? snap.names[i] + ' ' + pct.toFixed(1) + '%' : ''}</span></div>`
   }).join('')
+  $('stack-axis').innerHTML =
+    `<div class="cap-mark" style="left:${Math.min(snap.cap / 100, 100)}%">cap ${(snap.cap / 100).toFixed(0)}%</div>`
+}
 
-  document.getElementById('legend').innerHTML = s.xp.map((x,i)=>{
-    const pct = s.totalN>0 ? x/s.totalN*100 : 0
-    const usd = prices[s.names[i]]
-    return `<div class="lg" style="border-left-color:${BARS[i]}" onclick="selectSlot(${i})">
-      <div class="lg-top"><span class="lg-name">${s.names[i]}${s.paused[i]?'<span class="paused-tag">пауза</span>':''}</span>
-        <span class="lg-share" style="${pct>s.cap/100?'color:var(--red)':''}">${pct.toFixed(1)}%</span></div>
-      <div class="lg-amt">${num(x)}</div>
-      <div class="lg-usd">${usd?('≈ $'+num(x*usd)):'&nbsp;'}</div>
-    </div>`
-  }).join('')
-  document.getElementById('stack-axis').innerHTML =
-    `<div class="cap-mark" style="left:${Math.min(capPct,97)}%">потолок ${capPct}%</div>`
-
-  const over = s.xp.map((x,i)=> s.totalN>0 && x/s.totalN*100>capPct ? s.names[i] : null).filter(Boolean)
-  document.getElementById('hero-note').innerHTML = over.length
-    ? `<span style="color:var(--red)">Выше потолка: ${over.join(', ')}. Наращивать долю этих активов нельзя — односторонний вход в них и выход в остальные будут отклонены.</span>`
-    : (isStale ? 'Данные из кеша, обновляются…' : 'Нажмите на сегмент, чтобы раскрыть слот.')
-
-  stale(['hero-tvl','hero-supply','hero-d','hero-vp','hero-a','hero-cap','hero-n'], isStale)
-  if(selSlot>=0) renderSlot(selSlot)
+function renderLegend(){
+  const tot = snap.total || 1
+  $('legend').innerHTML = snap.xp.map((v, i) => `
+    <div class="lg" style="border-left-color:${BARS[i]}" onclick="selectSlot(${i})">
+      <div class="lg-top"><span class="lg-name">${snap.names[i]}</span>
+        <span class="lg-share">${(v / tot * 100).toFixed(2)} %</span></div>
+      <div class="lg-amt">${num(v, 0)}</div></div>`).join('')
 }
 
 function selectSlot(i){
-  selSlot = (selSlot===i) ? -1 : i
-  document.querySelectorAll('.seg').forEach((el,k)=>el.classList.toggle('active',k===selSlot))
-  const d=document.getElementById('slot-detail')
-  if(selSlot<0){ d.classList.remove('show'); return }
+  selSlot = (selSlot === i) ? -1 : i
+  renderStack()
+  const d = $('slot-detail')
+  if (selSlot < 0){ d.classList.remove('show'); return }
   renderSlot(selSlot); d.classList.add('show')
 }
 
 function renderSlot(i){
-  const s=snap; if(!s||!s.xp[i]&&s.xp[i]!==0) return
-  const pct = s.totalN>0 ? s.xp[i]/s.totalN*100 : 0
-  const capF = s.cap/10000
-  // сколько ещё можно внести односторонне до упора в потолок
-  const head = (capF*s.totalN - s.xp[i])/(1-capF)
-  const floorV = s.dN/s.n*0.005
-  document.getElementById('slot-detail').innerHTML = `
+  if (!snap) return
+  const pct = snap.total > 0 ? snap.xp[i] / snap.total * 100 : 0
+  const capF = snap.cap / 10000
+  const head = (capF * snap.total - snap.xp[i]) / (1 - capF)
+  const floorV = snap.D / snap.n * 0.005
+  $('slot-detail').innerHTML = `
     <div class="sd-top">
-      <div class="sd-name">${s.names[i]}${s.paused[i]?'<span class="paused-tag">приостановлен</span>':''}</div>
-      <a class="sd-link" href="${EXPLORER}/token/${s.addrs[i]}" target="_blank" rel="noopener">в эксплорере</a>
+      <div class="sd-name">${snap.names[i]}${snap.paused[i]
+        ? '<span class="paused-tag">PAUSED</span>' : ''}</div>
+      <a class="sd-link" href="${EXPLORER}/token/${snap.addrs[i]}" target="_blank"
+         rel="noopener">View In Explorer ↗</a>
     </div>
     <div class="sd-grid">
-      <div class="sd-cell"><div class="sd-k">в пуле</div><div class="sd-v">${num(s.xp[i])}</div></div>
-      <div class="sd-cell"><div class="sd-k">доля</div><div class="sd-v" style="color:${pct>s.cap/100?'var(--red)':'var(--txt)'}">${pct.toFixed(2)}%</div></div>
-      <div class="sd-cell"><div class="sd-k">знаков</div><div class="sd-v">${s.decs[i]}</div></div>
-      <div class="sd-cell"><div class="sd-k">запас до потолка</div><div class="sd-v">${head>0?num(head):'исчерпан'}</div></div>
-      <div class="sd-cell"><div class="sd-k">пол слота</div><div class="sd-v">${floorV.toFixed(2)}</div></div>
-      <div class="sd-cell"><div class="sd-k">приток</div><div class="sd-v" style="color:${s.paused[i]?'var(--red)':'var(--green)'}">${s.paused[i]?'закрыт':'открыт'}</div></div>
+      <div class="sd-cell"><div class="sd-k">In Pool</div><div class="sd-v">${num(snap.xp[i], 0)}</div></div>
+      <div class="sd-cell"><div class="sd-k">Share</div>
+        <div class="sd-v" style="color:${pct > snap.cap / 100 ? 'var(--red)' : 'var(--txt)'}">${pct.toFixed(2)} %</div></div>
+      <div class="sd-cell"><div class="sd-k">Decimals</div><div class="sd-v">${snap.decs[i]}</div></div>
+      <div class="sd-cell"><div class="sd-k">Headroom To Cap</div>
+        <div class="sd-v">${head > 0 ? num(head, 0) : 'exhausted'}</div></div>
+      <div class="sd-cell"><div class="sd-k">Slot Floor</div><div class="sd-v">${num(floorV)}</div></div>
+      <div class="sd-cell"><div class="sd-k">Deposits</div>
+        <div class="sd-v" style="color:${snap.paused[i] ? 'var(--red)' : 'var(--green)'}">
+          ${snap.paused[i] ? 'closed' : 'open'}</div></div>
     </div>
-    <div class="sd-addr">${s.addrs[i]}</div>`
-}
-
-// ---------- загрузка ----------
-function buildUI(){
-  const opts = NAMES.map((n,i)=>`<option value="${i}">${n}</option>`).join('')
-  document.getElementById('sw-from').innerHTML = opts
-  document.getElementById('sw-to').innerHTML   = opts
-  document.getElementById('mt-tok').innerHTML  = opts
-  if(N>1) document.getElementById('sw-to').value='1'
-  document.getElementById('bal-grid').innerHTML =
-    NAMES.map((n,i)=>`<div class="bal-item"><div class="bal-dot" style="background:${BARS[i]}"></div>
-      <div class="bal-info"><div class="bal-name">${n}</div><div class="bal-val" id="bal-${i}">—</div></div></div>`).join('')
-    +`<div class="bal-item" style="grid-column:span 2"><div class="bal-dot" style="background:#fff"></div>
-      <div class="bal-info"><div class="bal-name">BSKUSD</div><div class="bal-val" id="bal-bsk">—</div></div></div>`
-  document.getElementById('pb-forfeit').innerHTML = NAMES.map((n,i)=>
-    `<label class="ff-item" id="ff-${i}"><input type="checkbox" onchange="tglForfeit(${i},this)"/> ${n}</label>`).join('')
-}
-
-async function loadBasket(){
-  const p = pool||poolRO
-  // состав меняется только при расширении или ротации, но читается N+1
-  // запросом — кеш убирает мигание пустых полей при загрузке
-  const cb = cacheLoad('basket')
-  if(cb){ N=cb.data.N; TKN=cb.data.TKN; NAMES=cb.data.NAMES; DEC=cb.data.DEC; buildUI()
-    const cs=cacheLoad('pool'); if(cs){ snap=cs.data; renderHero(snap,true) } }
-  N = (await p.n_coins()).toNumber()
-  TKN=[];NAMES=[];DEC=[]
-  for(let i=0;i<N;i++){
-    const a=await p.tokens(i), d=await p.token_decimals(i)
-    let sym='слот '+i
-    try{ sym=await new ethers.Contract(a,ERC20_ABI,rpc).symbol() }catch(e){}
-    TKN.push(a); DEC.push(d); NAMES.push(sym)
-  }
-  cacheSave('basket',{N,TKN,NAMES,DEC}); buildUI()
-}
-
-async function loadStats(){
-  try{
-    const p=pool||poolRO
-    const [xp,D,supply,A,cap,n]=await p.get_state()
-    N=n.toNumber()
-    const paused=await Promise.all(Array.from({length:N},(_,i)=>p.paused(i)))
-    const arr=xp.slice(0,N).map(x=>parseFloat(ethers.utils.formatUnits(x,18)))
-    snap={ xp:arr, totalN:arr.reduce((a,b)=>a+b,0),
-      dN:parseFloat(ethers.utils.formatUnits(D,18)),
-      supplyN:parseFloat(ethers.utils.formatUnits(supply,18)),
-      A:A.toString(), cap:cap.toNumber(), n:N, paused,
-      names:NAMES.slice(0,N), decs:DEC.slice(0,N), addrs:TKN.slice(0,N) }
-    cacheSave('pool',snap)
-    renderHero(snap,false)
-  }catch(e){ console.error('loadStats',e) }
-}
-
-function paintBal(v,isStale){
-  v.tokens.forEach((t,i)=>{ const e=document.getElementById('bal-'+i); if(e){ e.textContent=t; e.classList.toggle('stale',!!isStale) } })
-  const b=document.getElementById('bal-bsk'); if(b){ b.textContent=v.bsk; b.classList.toggle('stale',!!isStale) }
-}
-
-async function loadBalances(){
-  if(!userAddr) return
-  const p=pool||poolRO
-  // Кеш заполняет пустоту до первого ответа сети. Порядок обновления
-  // сохранён: сначала токены слева направо, потом BSKUSD.
-  const c=cacheLoad('bal',userAddr)
-  if(c && c.data.tokens.length===N){
-    paintBal(c.data,true)
-    document.getElementById('bal-age').textContent='Показаны данные '+ago(c.age)+', обновляются…'
-  }
-  try{
-    const out={tokens:[],bsk:'—'}
-    for(let i=0;i<N;i++){
-      const b=await new ethers.Contract(TKN[i],ERC20_ABI,rpc).balanceOf(userAddr)
-      rawBal['t'+i]=b
-      const t=fmt(b,DEC[i],DEC[i]===18?4:2)+' '+NAMES[i]
-      out.tokens.push(t)
-      const e=document.getElementById('bal-'+i); if(e){ e.textContent=t; e.classList.remove('stale') }
-    }
-    const bsk=await p.balanceOf(userAddr)
-    rawBal['bsk']=bsk
-    out.bsk=fmt(bsk,18,4)+' BSKUSD'
-    paintBal(out,false)
-    document.getElementById('bal-age').textContent=''
-    cacheSave('bal',out,userAddr)
-  }catch(e){ console.error('loadBalances',e) }
-}
-
-async function loadFeeRates(){
-  const p=pool||poolRO
-  try{
-    const [m,sw,b]=await p.fees()
-    FEE={mint:m.toNumber(), swap:sw.toNumber(), burn:b.toNumber()}
-    renderFeeRates()
-  }catch(e){ console.error('loadFeeRates',e) }
-}
-
-function renderFeeRates(){
-  const el=document.getElementById('fee-rates')
-  if(!el||FEE.mint===null) return
-  const sum=FEE.mint+FEE.burn
-  el.innerHTML=`
-    <div class="fee3">
-      <div class="f3"><div class="f3-k">вход</div><div class="f3-v">${bp(FEE.mint)}</div></div>
-      <div class="f3"><div class="f3-k">обмен</div><div class="f3-v">${bp(FEE.swap)}</div></div>
-      <div class="f3"><div class="f3-k">выход</div><div class="f3-v">${bp(FEE.burn)}</div></div>
-    </div>` +
-    (FEE.swap>sum
-      ? `<div class="warn">Обмен дороже, чем вход плюс выход (${bp(FEE.swap)} против ${bp(sum)}).
-         Тот же результат дешевле получить в два шага: внести в один слот и вывести из другого.
-         Разница окупает лишний газ примерно от 3 000 $ оборота.</div>`
-      : '')
-}
-
-async function loadFees(){
-  try{
-    const p=pool||poolRO, zero=ethers.constants.AddressZero
-    const [t,w,tbp]=await Promise.all([p.treasury(),p.wsUSD(),p.treasury_bp()])
-    document.getElementById('fd-treasury').textContent=fmt(await p.balanceOf(t),18,2)+' BSKUSD'
-    if(w!==zero){
-      document.getElementById('fd-wsusd').textContent=fmt(await p.balanceOf(w),18,2)+' BSKUSD'
-      document.getElementById('fd-note').textContent=
-        `Делится ${tbp.toNumber()/100}% казне и ${(10000-tbp.toNumber())/100}% стейкерам. Казна ${short(t)}, вейл ${short(w)}.`
-    }else{
-      document.getElementById('fd-wsusd').textContent='вейл не задан'
-      document.getElementById('fd-note').textContent=`Пока вейл не задан, вся комиссия идёт в казну ${short(t)}.`
-    }
-  }catch(e){ console.error('loadFees',e) }
-}
-
-// Пользователю это нужнее, чем админу: добавление актива сузит потолок и
-// удвоит проскальзывание. Узнать постфактум — значит не иметь шанса выйти.
-async function loadPending(){
-  const p=pool||poolRO, zero=ethers.constants.AddressZero, items=[]
-  try{
-    const [pt,pta,pa,pav,ps,psv,pw,pwa,na]=await Promise.all([
-      p.pending_token_eta(),p.pending_token(),p.pending_a_eta(),p.pending_a(),
-      p.pending_split_eta(),p.pending_treasury_bp(),p.pending_wsUSD_eta(),p.pending_wsUSD(),p.next_a_preview()])
-    if(!pt.eq(0)){ const E=eta(pt)
-      items.push(`<b>В корзину добавят актив</b> ${short(pta)}.<br/>Потолок доли сузится до 40%, параметр A станет ${na.toString()} — проскальзывание вырастет примерно вдвое.<br/>${E.when} — ${E.left}`) }
-    if(!pa.eq(0)){ const E=eta(pa); items.push(`<b>Параметр кривой станет ${pav.toString()}</b>.<br/>${E.when} — ${E.left}`) }
-    try{
-      const [qm,qs,qb,qe]=await p.pending_fees()
-      if(!qe.eq(0)){ const E=eta(qe)
-        items.push(`<b>Комиссии станут ${bp(qm.toNumber())} вход, ${bp(qs.toNumber())} обмен, ${bp(qb.toNumber())} выход</b>.<br/>${E.when} — ${E.left}`) }
-    }catch(e){}
-    if(!ps.eq(0)){ const E=eta(ps); items.push(`<b>Доля казны станет ${psv.toNumber()/100}%</b>.<br/>${E.when} — ${E.left}`) }
-    if(!pw.eq(0)){ const E=eta(pw); items.push(`<b>Получатель доходной части сменится</b> на ${short(pwa)}.<br/>${E.when} — ${E.left}`) }
-    for(let i=0;i<N;i++){
-      const [rt,re]=await Promise.all([p.rot_token(i),p.rot_eta(i)])
-      if(rt!==zero&&!re.eq(0)){ const E=eta(re)
-        items.push(`<b>Слот ${NAMES[i]||i} заменят</b> на ${short(rt)}.<br/>${E.when} — ${E.left}`) }
-    }
-  }catch(e){ console.error('loadPending',e) }
-  const card=document.getElementById('card-pending')
-  if(!items.length){ card.style.display='none'; return }
-  card.style.display='block'
-  document.getElementById('pending-list').innerHTML=items.map(t=>`<div class="pending">${t}</div>`).join('')
-}
-
-// Границы операций видны только по реверту, если их не посчитать заранее.
-async function loadLimits(){
-  try{
-    const p=pool||poolRO
-    const minDel=await p.MIN_DELIVERED_BP()
-    if(!snap) return
-    const capF=snap.cap/10000
-    const maxIn=snap.xp.map(x=>{ const m=(capF*snap.totalN-x)/(1-capF); return m>0?m:0 })
-    const rows=[
-      ['пол каждого слота',(snap.dN/snap.n*0.005).toFixed(2)+' — ниже опустить нельзя'],
-      ['минимум вывода корзиной','доставить не меньше '+(minDel.toNumber()/100)+'% причитающегося'],
-      ['максимум одностороннего входа', maxIn.map((m,i)=>`${snap.names[i]} ${num(m)}`).join(' · ')],
-    ]
-    document.getElementById('limits').innerHTML=rows.map(([k,v])=>
-      `<div class="adm-row"><span class="adm-k">${k}</span><span class="adm-v">${v}</span></div>`).join('')
-      +`<div class="note">Вход сверх указанного упрётся в потолок доли. Корзиной можно вносить без ограничения — пропорциональный депозит долей не меняет.</div>`
-  }catch(e){ console.error('loadLimits',e) }
-}
-
-async function loadAll(){
-  await loadStats()
-  await Promise.all([loadBalances(),loadFeeRates(),loadFees(),loadPending(),loadLimits()])
-  renderPrices()
-  if(isAdmin) await loadAdmin()
-}
-
-// ---------- кнопки «макс» ----------
-// Баланс уже прочитан для карточки — берём оттуда, чтобы не дёргать сеть
-// на каждый клик.
-let rawBal = {}
-
-function setMax(id, key, dec, tag){
-  const b = rawBal[key]
-  if (b === undefined){ setStatus('Баланс ещё не загружен','error'); return }
-  document.getElementById(id).value = ethers.utils.formatUnits(b, dec)
-  dq(tag)
-}
-function maxSwap(){ setMax('sw-amt','t'+document.getElementById('sw-from').value, DEC[+document.getElementById('sw-from').value],'sw') }
-function maxMint(){ setMax('mt-amt','t'+document.getElementById('mt-tok').value, DEC[+document.getElementById('mt-tok').value],'mt') }
-function maxBurn(){ setMax('bn-amt','bsk',18,'bn') }
-function maxPropBurn(){ setMax('pb-bsk','bsk',18,'pb') }
-function maxStake(){ setMax('sk-in','bsk',18,'sk') }
-function maxUnstake(){ setMax('sk-out','ws',18,'un') }
-
-// ---------- внешние цены ----------
-// Пул НЕ ЗНАЕТ цен: оракула в нём нет по построению, все активы всегда
-// считаются равными доллару. Именно поэтому кривая не сопротивляется
-// депегу — контракт не видит, что актив стоит 0.60.
-//
-// Интерфейс видеть может, и это ровно то предупреждение, которое
-// контракт дать не в состоянии. Но показывать цену надо так, чтобы никто
-// не решил, будто пул на неё опирается.
-let prices = {}
-
-const CG_IDS = {
-  USDT:'tether', USDC:'usd-coin', DAI:'dai', PYUSD:'paypal-usd',
-  FRAX:'frax', TUSD:'true-usd', USDP:'paxos-standard', LUSD:'liquity-usd',
-  GUSD:'gemini-dollar', USDE:'ethena-usde', USDS:'usds'
-}
-
-async function loadPrices(){
-  const box=document.getElementById('price-box')
-  const ids=[...new Set(NAMES.map(n=>CG_IDS[n.toUpperCase()]).filter(Boolean))]
-  if(!ids.length){ box.classList.remove('show'); return }
-  try{
-    const r=await fetch('https://api.coingecko.com/api/v3/simple/price?ids='+ids.join(',')+'&vs_currencies=usd')
-    if(!r.ok) throw new Error('http '+r.status)
-    const d=await r.json()
-    prices={}
-    NAMES.forEach(n=>{
-      const id=CG_IDS[n.toUpperCase()]
-      if(id&&d[id]&&d[id].usd) prices[n]=d[id].usd
-    })
-    renderPrices()
-    if(snap) renderHero(snap,false)
-  }catch(e){
-    // сеть недоступна или лимит запросов — блок просто не показываем,
-    // остальная страница работает без него
-    box.classList.remove('show')
-    console.warn('loadPrices', e)
-  }
+    <div class="sd-addr">${snap.addrs[i]}</div>`
 }
 
 function renderPrices(){
-  const box=document.getElementById('price-box')
-  if(!snap || !Object.keys(prices).length){ box.classList.remove('show'); return }
-  let known=0, valueUsd=0
-  snap.names.forEach((n,i)=>{ const p=prices[n]; if(p){ known++; valueUsd+=snap.xp[i]*p } })
-  if(!known){ box.classList.remove('show'); return }
+  const box = $('price-box')
+  if (!snap || !Object.keys(prices).length){ box.classList.remove('show'); return }
+  let known = 0, valueUsd = 0
+  snap.names.forEach((n, i) => { const p = prices[n]; if (p){ known++; valueUsd += snap.xp[i] * p } })
+  if (!known){ box.classList.remove('show'); return }
   box.classList.add('show')
-
-  const covered = known===snap.n
-  const unit = snap.supplyN>0 ? valueUsd/snap.supplyN : 0
-  document.getElementById('pb-value').textContent='$'+num(valueUsd)
-  const u=document.getElementById('pb-unit')
-  u.textContent='$'+unit.toFixed(4)
-  u.style.color = unit<0.99 ? 'var(--red)' : (unit>1.005 ? 'var(--amber)' : 'var(--green)')
-
-  document.getElementById('pb-prices').innerHTML=snap.names.map((n,i)=>{
-    const p=prices[n]
-    const off = p && Math.abs(p-1)>0.01
-    return `<div class="pb-cell${off?' off':''}">${n}<b>${p?('$'+p.toFixed(4)):'нет цены'}</b></div>`
+  const unit = snap.supply > 0 ? valueUsd / snap.supply : 0
+  $('pb-value').textContent = '$' + num(valueUsd)
+  const u = $('pb-unit')
+  u.textContent = '$' + unit.toFixed(4)
+  u.style.color = unit < 0.99 ? 'var(--red)' : (unit > 1.005 ? 'var(--amber)' : 'var(--green)')
+  $('pb-prices').innerHTML = snap.names.map(n => {
+    const p = prices[n], off = p && Math.abs(p - 1) > 0.01
+    return `<div class="pb-cell${off ? ' off' : ''}">${n}<b>${p ? '$' + p.toFixed(4) : 'no price'}</b></div>`
   }).join('')
-
-  const depegged=snap.names.filter(n=>prices[n]&&Math.abs(prices[n]-1)>0.01)
-  document.getElementById('pb-note').innerHTML =
-    (depegged.length ? `<span style="color:var(--red)"><b>Отклонение от доллара: ${depegged.join(', ')}.</b> Пул этого не видит и продолжает считать актив за доллар — арбитраж будет заливать подешевевший актив, пока не упрётся в потолок доли.</span><br/>` : '')
-    + `Цены получены снаружи, из CoinGecko. <b>Контракт их не использует</b> и не может: оракула в нём нет, все активы всегда считаются равными доллару.`
-    + (covered ? '' : ' Часть активов без цены — оценка неполная.')
-    + ' На тестовой сети токены моковые, и цена по символу к ним отношения не имеет.'
+  const depegged = snap.names.filter(n => prices[n] && Math.abs(prices[n] - 1) > 0.01)
+  $('pb-note').innerHTML =
+    (depegged.length ? `<span style="color:var(--red)"><b>Off the dollar: ${depegged.join(', ')}.</b>
+      The pool does not see this and keeps counting the asset as a dollar — arbitrage will pour the
+      cheaper asset in until it hits the share cap.</span><br/>` : '')
+    + `Prices come from CoinGecko. <b>The contract does not use them</b> and cannot: there is no
+       oracle in it, every asset is always treated as worth one dollar.`
 }
 
-// ---------- подключение ----------
-async function connectWallet(){
-  let eth=null
-  if(window.ethereum?.isMetaMask) eth=window.ethereum
-  else if(window.ethereum?.providers) eth=window.ethereum.providers.find(p=>p.isMetaMask)
-  else if(window.ethereum) eth=window.ethereum
-  if(!eth){ setStatus('MetaMask не найден. Установите расширение и обновите страницу.','error'); return }
-  try{
-    provider=new ethers.providers.Web3Provider(eth)
-    await provider.send('eth_requestAccounts',[])
-    const net=await provider.getNetwork()
-    if(net.chainId!==CHAIN_ID){
-      try{ await eth.request({method:'wallet_switchEthereumChain',params:[{chainId:'0x'+CHAIN_ID.toString(16)}]}) }catch(e){}
-      provider=new ethers.providers.Web3Provider(eth)
-    }
-    signer=provider.getSigner()
-    userAddr=await signer.getAddress()
-    pool=new ethers.Contract(POOL_ADDR,POOL_ABI,signer)
-    document.getElementById('btn-wallet').textContent=short(userAddr)
-    document.getElementById('btn-wallet').classList.add('connected')
-    document.getElementById('addr-display').textContent=userAddr
-    const adm=await poolRO.admin()
-    isAdmin = adm.toLowerCase()===userAddr.toLowerCase()
-    document.getElementById('admin-pill').style.display=isAdmin?'inline-block':'none'
-    document.getElementById('tab-admin').style.display=isAdmin?'block':'none'
-    ;['btn-swap','btn-mint','btn-burn','btn-pmint','btn-pburn'].forEach(id=>document.getElementById(id).disabled=false)
-    await loadAll(); await loadStake()
-    clearStatus()
-  }catch(e){ setStatus('Не удалось подключиться: '+(e.message||e),'error') }
+function buildSelectors(){
+  const opts = snap.names.map((n, i) =>
+    `<option value="${i}"${snap.paused[i] ? ' data-paused="1"' : ''}>${n}${snap.paused[i] ? ' (paused)' : ''}</option>`).join('')
+  const keep = id => { const el = $(id); const v = el.value; el.innerHTML = opts; if (v !== '') el.value = v }
+  keep('sw-from'); keep('sw-to'); keep('mt-tok'); keep('bn-tok')
+  if ($('sw-to').value === $('sw-from').value && snap.n > 1) $('sw-to').value = '1'
 }
 
-// ---------- вкладки ----------
-function setTab(t,btn){
-  ;['swap','mint','burn','prop','stake','admin'].forEach(n=>{
-    const e=document.getElementById('pnl-'+n); if(e) e.style.display = n===t?'block':'none' })
-  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'))
-  btn.classList.add('active'); clearStatus()
-  if(t==='admin') loadAdmin()
-  if(t==='stake') loadStake()
+function toggleCollapse(k){
+  $('body-' + k).classList.toggle('open')
+  $('chev-' + k).classList.toggle('open')
+  try { localStorage.setItem('bskusd:ui:' + k, $('body-' + k).classList.contains('open') ? '1' : '0') } catch {}
 }
-function setSlip(k,v,btn){ slip[k]=v
-  btn.closest('.slip-row').querySelectorAll('.slip-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active') }
-function cSlip(k,i){ slip[k]=parseFloat(i.value)||0.5
-  i.closest('.slip-row').querySelectorAll('.slip-btn').forEach(b=>b.classList.remove('active')) }
-function dq(k){ clearTimeout(timers[k])
-  const f={sw:qSwap,mt:qMint,bn:qBurn,pm:qPropMint,pb:qPropBurn,sk:qStake,un:qUnstake}
-  timers[k]=setTimeout(f[k],400) }
-function flipSwap(){ const a=document.getElementById('sw-from'),b=document.getElementById('sw-to')
-  const t=a.value; a.value=b.value; b.value=t; dq('sw') }
-function tglForfeit(i,el){ forfeit[i]=el.checked
-  document.getElementById('ff-'+i).classList.toggle('on',el.checked)
-  document.getElementById('pb-warn').style.display=forfeit.some(x=>x)?'block':'none'; dq('pb') }
 
-// ---------- котировки ----------
-async function qSwap(){
-  const i=+document.getElementById('sw-from').value, j=+document.getElementById('sw-to').value
-  const v=document.getElementById('sw-amt').value
-  const out=document.getElementById('sw-out'), box=document.getElementById('sw-qbox')
-  if(i===j||!v||parseFloat(v)<=0){ out.value=''; box.style.display='none'; return }
-  try{
-    const dx=parseAmt(v,DEC[i]); if(!dx) return
-    const dy=await (pool||poolRO).get_dy(i,j,dx)
-    out.value=fmt(dy,DEC[j],DEC[j]===18?6:4)
-    const r=parseFloat(ethers.utils.formatUnits(dy,DEC[j]))/parseFloat(v)
-    document.getElementById('sw-rate').textContent=`1 ${NAMES[i]} ≈ ${r.toFixed(6)} ${NAMES[j]}`
-    let sub=`Комиссия обмена ${bp(FEE.swap)} уже учтена. Минимум при допуске ${slip.sw}%: ${fmt(minOut(dy,slip.sw),DEC[j],4)} ${NAMES[j]}`
-    if(FEE.swap!==null && FEE.swap > FEE.mint+FEE.burn)
-      sub+=` · дешевле в два шага: внести ${NAMES[i]} (${bp(FEE.mint)}) и вывести ${NAMES[j]} (${bp(FEE.burn)})`
-    document.getElementById('sw-sub').textContent=sub
-    box.style.display='block'
-  }catch(e){
-    out.value=''; box.style.display='block'
-    document.getElementById('sw-rate').textContent='Маршрут закрыт'
-    document.getElementById('sw-sub').textContent='Потолок доли, пол слота или приостановленный актив. Попробуйте другую пару или меньшую сумму.'
+/* ============================ slippage rows ============================ */
+function renderSlipRows(){
+  const html = `<span>Slippage</span>
+    ${[0.001, 0.005, 0.01].map(v =>
+      `<button class="slip-btn${slip === v ? ' on' : ''}" onclick="setSlip(${v})">${v * 100} %</button>`).join('')}
+    <input class="slip-in" id="slip-custom" type="number" step="0.1" min="0" max="50"
+           placeholder="%" oninput="setSlip(parseFloat(this.value)/100)"/>`
+  ;['slip-swap', 'slip-mint', 'slip-burn'].forEach(id => { const el = $(id); if (el) el.innerHTML = html })
+}
+function setSlip(v){
+  if (!Number.isFinite(v) || v < 0) return
+  slip = v
+  renderSlipRows()
+  requoteActive()
+}
+const minOut = bn => bn.mul(Math.round((1 - slip) * 1e6)).div(1e6)
+
+/* ============================ tabs ============================ */
+let activeTab = 'swap'
+function setTab(t, el){
+  activeTab = t
+  ;['swap','mint','burn','prop','stake','admin'].forEach(k =>
+    $('pnl-' + k).style.display = (k === t ? 'block' : 'none'))
+  document.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', b === el))
+  requoteActive()
+}
+function requoteActive(){
+  if (activeTab === 'swap') quoteSwap()
+  else if (activeTab === 'mint') quoteMint()
+  else if (activeTab === 'burn') quoteBurn()
+  else if (activeTab === 'prop') { propMode === 'in' ? quotePropIn() : quotePropOut() }
+}
+
+/* ============================ swap ============================ */
+function flipSwap(){
+  const a = $('sw-from').value, b = $('sw-to').value
+  $('sw-from').value = b; $('sw-to').value = a
+  quoteSwap()
+}
+function setMaxSwap(){
+  const i = +$('sw-from').value
+  const b = rawBal[snap?.names[i]]
+  if (!b){ setStatus('Balance not loaded yet.', 'error'); return }
+  $('sw-amt').value = ethers.utils.formatUnits(b, snap.decs[i])
+  quoteSwap()
+}
+let swapQuote = null
+async function quoteSwap(){
+  swapQuote = null; $('sw-out').value = ''; $('sw-rate').textContent = '—'
+  why('swap', ''); lock('btn-swap', true)
+  if (!snap) return
+  const i = +$('sw-from').value, j = +$('sw-to').value
+  if (i === j){ why('swap', 'Pick two different assets.'); return }
+  const amt = parseU($('sw-amt').value, snap.decs[i])
+  if (!amt) return
+  if (snap.paused[i]){ why('swap', snap.names[i] + ' is paused — deposits of it are closed.'); return }
+  const bal = rawBal[snap.names[i]]
+  if (account && bal && amt.gt(bal)){
+    why('swap', `Not enough ${snap.names[i]}. You have ${fmtU(bal, snap.decs[i])}.`); return
   }
-}
-async function qMint(){
-  const i=+document.getElementById('mt-tok').value, v=document.getElementById('mt-amt').value
-  const q=document.getElementById('mt-quote')
-  if(!v||parseFloat(v)<=0){ q.textContent='—'; document.getElementById('mt-sub').textContent=''; return }
   try{
-    const raw=parseAmt(v,DEC[i]); if(!raw) return
-    const o=await (pool||poolRO).quote_mint_net(i,raw)
-    q.textContent=fmt(o,18,6)+' BSKUSD'
-    const loss=(parseFloat(v)-parseFloat(ethers.utils.formatUnits(o,18)))/parseFloat(v)*100
-    document.getElementById('mt-sub').textContent=
-      `Потеря ${loss.toFixed(4)}%: комиссия входа ${bp(FEE.mint)} плюс проскальзывание от перекоса пула.`
-  }catch(e){ q.textContent='Отклонено'
-    document.getElementById('mt-sub').textContent='Слот приостановлен либо операция упёрлась в потолок доли.' }
-}
-async function qBurn(){
-  const v=document.getElementById('bn-amt').value, q=document.getElementById('bn-quote')
-  if(!v||parseFloat(v)<=0){ q.textContent='—'; document.getElementById('bn-all').innerHTML=''; return }
-  try{
-    const raw=parseAmt(v,18); if(!raw) return
-    const all=await (pool||poolRO).quote_burn_each(raw)
-    document.getElementById('bn-all').innerHTML=all.slice(0,N).map((x,i)=>{
-      const closed=x.isZero()
-      return `<div class="ba-item${i===burnSel?' selected':''}${closed?' closed':''}" ${closed?'':`onclick="selBurn(${i})"`}>
-        <div class="ba-name">${NAMES[i]}</div>
-        <div class="ba-val">${closed?'закрыт':fmt(x,DEC[i],DEC[i]===18?6:4)}</div></div>` }).join('')
-    const sel=all[burnSel]
-    if(sel.isZero()){ q.textContent='Маршрут закрыт'
-      document.getElementById('bn-sub').textContent='Выход в этот актив упирается в потолок доли или пол слота. Выберите другой токен или выведите корзиной.'
-      return }
-    q.textContent=fmt(sel,DEC[burnSel],DEC[burnSel]===18?6:4)+' '+NAMES[burnSel]
-    document.getElementById('bn-sub').textContent=
-      `Комиссия выхода ${bp(FEE.burn)}. Минимум при допуске ${slip.bn}%: ${fmt(minOut(sel,slip.bn),DEC[burnSel],4)} ${NAMES[burnSel]}`
-  }catch(e){ q.textContent='Отклонено' }
-}
-function selBurn(i){ burnSel=i
-  document.querySelectorAll('.ba-item').forEach((e,k)=>e.classList.toggle('selected',k===i)); dq('bn') }
-async function qPropMint(){
-  const v=document.getElementById('pm-bsk').value
-  const q=document.getElementById('pm-quote'), a=document.getElementById('pm-amounts')
-  if(!v||parseFloat(v)<=0){ q.textContent='—'; a.innerHTML=''; return }
-  try{
-    const raw=parseAmt(v,18); if(!raw) return
-    const [net,am]=await (pool||poolRO).quote_mint_proportional(raw)
-    q.textContent=fmt(net,18,6)+' BSKUSD'
-    document.getElementById('pm-sub').textContent=
-      `Комиссия входа ${bp(FEE.mint)}. Проскальзывания нет, объём не ограничен потолком.`
-    a.innerHTML=am.slice(0,N).map((x,i)=>`<div class="ba-item"><div class="ba-name">внести ${NAMES[i]}</div>
-      <div class="ba-val">${fmt(x,DEC[i],DEC[i]===18?6:4)}</div></div>`).join('')
-  }catch(e){ q.textContent='Отклонено'; a.innerHTML='' }
-}
-async function qPropBurn(){
-  const v=document.getElementById('pb-bsk').value, a=document.getElementById('pb-amounts')
-  if(!v||parseFloat(v)<=0){ a.innerHTML=''; document.getElementById('pb-sub').textContent=''; return }
-  try{
-    const raw=parseAmt(v,18); if(!raw) return
-    const am=await (pool||poolRO).quote_burn_proportional(raw)
-    a.innerHTML=am.slice(0,N).map((x,i)=>`<div class="ba-item" style="${forfeit[i]?'opacity:.4':''}">
-      <div class="ba-name">${NAMES[i]}${forfeit[i]?' — отказ':''}</div>
-      <div class="ba-val">${forfeit[i]?'0':fmt(x,DEC[i],DEC[i]===18?6:4)}</div></div>`).join('')
-    document.getElementById('pb-sub').textContent=
-      `Комиссия выхода ${bp(FEE.burn)}. Пропорции текущие, а не равные: чего в пуле больше, того и получите больше.`
-  }catch(e){ a.innerHTML=''
-    document.getElementById('pb-sub').textContent='Сумма слишком мала: доли по слотам с малым числом знаков усекаются в ноль.' }
-}
-
-// ---------- операции ----------
-async function ensureApprove(token,amount,label,spender){
-  const sp = spender||POOL_ADDR
-  const t=new ethers.Contract(token,ERC20_ABI,signer)
-  if((await t.allowance(userAddr,sp)).lt(amount)){
-    setStatus('Разрешаю списание '+label+'…','info')
-    await (await t.approve(sp,ethers.constants.MaxUint256)).wait()
-  }
+    const dy = await (pool || poolRO).get_dy(i, j, amt)
+    if (dy.isZero()){ why('swap', 'This trade returns nothing at the current pool state.'); return }
+    $('sw-out').value = ethers.utils.formatUnits(dy, snap.decs[j])
+    const inN  = Number(ethers.utils.formatUnits(amt, snap.decs[i]))
+    const outN = Number(ethers.utils.formatUnits(dy, snap.decs[j]))
+    $('sw-rate').textContent = `1 ${snap.names[i]} = ${(outN / inN).toFixed(5)} ${snap.names[j]}`
+    swapQuote = { i, j, amt, dy }
+    lock('btn-swap', !account)
+    if (!account) why('swap', 'Connect your wallet to trade.')
+  }catch(e){ why('swap', 'Rejected by the pool: ' + errText(e)) }
 }
 async function doSwap(){
-  const i=+document.getElementById('sw-from').value, j=+document.getElementById('sw-to').value
-  if(i===j){ setStatus('Выберите разные токены','error'); return }
-  const v=document.getElementById('sw-amt').value
-  if(!v||parseFloat(v)<=0){ setStatus('Введите сумму','error'); return }
+  if (!swapQuote) return
+  const { i, j, amt, dy } = swapQuote
+  if (!await ensureAllowance(snap.addrs[i], amt, snap.names[i])) return
+  await tx('Swap', () => pool.exchange(i, j, amt, minOut(dy)),
+           { clear: ['sw-amt', 'sw-out'], after: [quoteSwap] })
+}
+
+/* ============================ deposit ============================ */
+function setMaxMint(){
+  const i = +$('mt-tok').value
+  const b = rawBal[snap?.names[i]]
+  if (!b){ setStatus('Balance not loaded yet.', 'error'); return }
+  $('mt-amt').value = ethers.utils.formatUnits(b, snap.decs[i])
+  quoteMint()
+}
+let mintQuote = null
+async function quoteMint(){
+  mintQuote = null; $('mt-out').value = ''; why('mint', ''); lock('btn-mint', true)
+  if (!snap) return
+  const i = +$('mt-tok').value
+  const capF = snap.cap / 10000
+  const head = (capF * snap.total - snap.xp[i]) / (1 - capF)
+  $('mt-head').textContent = head > 0 ? num(head, 0) + ' ' + snap.names[i] : 'cap reached'
+  const amt = parseU($('mt-amt').value, snap.decs[i])
+  if (!amt) return
+  if (snap.paused[i]){ why('mint', snap.names[i] + ' is paused — deposits are closed.'); return }
+  const bal = rawBal[snap.names[i]]
+  if (account && bal && amt.gt(bal)){
+    why('mint', `Not enough ${snap.names[i]}. You have ${fmtU(bal, snap.decs[i])}.`); return
+  }
   try{
-    const dx=parseAmt(v,DEC[i]), dy=await pool.get_dy(i,j,dx)
-    await ensureApprove(TKN[i],dx,NAMES[i])
-    setStatus('Отправляю обмен…','info')
-    await (await pool.exchange(i,j,dx,minOut(dy,slip.sw))).wait()
-    setStatus(`Обменяно ${v} ${NAMES[i]} на ${fmt(dy,DEC[j],4)} ${NAMES[j]}`,'success')
-    await loadAll()
-  }catch(e){ setStatus(errText(e),'error') }
+    const net = await (pool || poolRO).quote_mint_net(i, amt)
+    if (net.isZero()){ why('mint', 'This deposit mints nothing at the current pool state.'); return }
+    $('mt-out').value = ethers.utils.formatUnits(net, 18)
+    mintQuote = { i, amt, net }
+    lock('btn-mint', !account)
+    if (!account) why('mint', 'Connect your wallet to deposit.')
+  }catch(e){
+    why('mint', head > 0
+      ? `Rejected: this would push ${snap.names[i]} past the ${(snap.cap / 100).toFixed(0)} % share cap. ` +
+        `At most ${num(head, 0)} ${snap.names[i]} fits right now.`
+      : `${snap.names[i]} is already at the share cap — use the Basket tab instead.`)
+  }
 }
 async function doMint(){
-  const i=+document.getElementById('mt-tok').value, v=document.getElementById('mt-amt').value
-  if(!v||parseFloat(v)<=0){ setStatus('Введите сумму','error'); return }
+  if (!mintQuote) return
+  const { i, amt, net } = mintQuote
+  if (!await ensureAllowance(snap.addrs[i], amt, snap.names[i])) return
+  await tx('Deposit', () => pool.mint(i, amt, minOut(net)),
+           { clear: ['mt-amt', 'mt-out'], after: [quoteMint] })
+}
+
+/* ============================ withdraw (single asset) ============================ */
+/* The pool refuses a withdrawal that would drop a slot through its floor. The page
+   finds that boundary itself instead of letting the transaction revert in the wallet. */
+async function burnCapFor(slot){
+  const key = String(slot)
+  const stamp = snap.D.toFixed(6) + ':' + snap.xp[slot].toFixed(6)
+  if (burnCapCache[key] && burnCapCache[key].stamp === stamp) return burnCapCache[key].max
+  const p = pool || poolRO
+  // A burn can never release more than the slot holds, so that is the upper bound.
+  let lo = BN.from(0)
+  let hi = ethers.utils.parseUnits(Math.max(snap.xp[slot], 0).toFixed(18), 18)
+  const ok = async v => {
+    if (v.isZero()) return false
+    try { return !(await p.quote_burn(slot, v)).isZero() } catch { return false }
+  }
+  if (await ok(hi)){ burnCapCache[key] = { stamp, max: hi }; return hi }
+  for (let k = 0; k < 40 && hi.sub(lo).gt(1e9); k++){
+    const mid = lo.add(hi).div(2)
+    if (await ok(mid)) lo = mid; else hi = mid
+  }
+  burnCapCache[key] = { stamp, max: lo }
+  return lo
+}
+
+async function setMaxBurn(){
+  if (!snap) return
+  const slot = +$('bn-tok').value
+  setStatus('Working out the largest withdrawal this slot allows…', 'info')
+  const cap = await burnCapFor(slot)
+  const mine = rawBal.BSKUSD || BN.from(0)
+  const use = account && mine.lt(cap) ? mine : cap
+  $('bn-amt').value = ethers.utils.formatUnits(use, 18)
+  $('status-msg').classList.remove('show')
+  quoteBurn()
+}
+
+let burnQuote = null, burnSeq = 0
+async function quoteBurn(){
+  const seq = ++burnSeq
+  burnQuote = null; $('bn-out').value = ''; why('burn', ''); lock('btn-burn', true)
+  $('wrap-bn-amt').classList.remove('bad')
+  if (!snap) return
+  const slot = +$('bn-tok').value
+  const p = pool || poolRO
+
+  const cap = await burnCapFor(slot)
+  if (seq !== burnSeq) return
+  $('bn-cap').textContent = cap.isZero()
+    ? 'closed'
+    : fmtU(cap, 18, 2) + ' BSKUSD → ' + num(Number(ethers.utils.formatUnits(cap, 18)) /
+        (snap.supply || 1) * 100, 2) + ' % of supply'
+
+  const amt = parseU($('bn-amt').value, 18)
+  if (!amt) return
+
+  if (cap.isZero()){
+    $('wrap-bn-amt').classList.add('bad')
+    why('burn', `${snap.names[slot]} cannot be withdrawn right now — the slot is at its floor. ` +
+                `Pick another asset, or use the Basket tab.`)
+    return
+  }
+  const mine = rawBal.BSKUSD
+  if (account && mine && amt.gt(mine)){
+    $('wrap-bn-amt').classList.add('bad')
+    why('burn', `You hold ${fmtU(mine, 18, 4)} BSKUSD, which is less than this.`)
+    return
+  }
+  if (amt.gt(cap)){
+    $('wrap-bn-amt').classList.add('bad')
+    why('burn', `Too large for ${snap.names[slot]}. This slot can release at most ` +
+                `${fmtU(cap, 18, 4)} BSKUSD worth before hitting its floor. ` +
+                `Use the Basket tab to take out more.`)
+    return
+  }
   try{
-    const raw=parseAmt(v,DEC[i]), q=await pool.quote_mint_net(i,raw)
-    await ensureApprove(TKN[i],raw,NAMES[i])
-    setStatus('Вношу…','info')
-    await (await pool.mint(i,raw,minOut(q,slip.mt))).wait()
-    setStatus(`Получено ${fmt(q,18,4)} BSKUSD`,'success')
-    await loadAll()
-  }catch(e){ setStatus(errText(e),'error') }
+    const out = await p.quote_burn(slot, amt)
+    if (seq !== burnSeq) return
+    if (out.isZero()){
+      $('wrap-bn-amt').classList.add('bad')
+      why('burn', 'This amount rounds down to nothing in ' + snap.names[slot] + '.')
+      return
+    }
+    $('bn-out').value = ethers.utils.formatUnits(out, snap.decs[slot])
+    burnQuote = { slot, amt, out }
+    lock('btn-burn', !account)
+    if (!account) why('burn', 'Connect your wallet to withdraw.')
+  }catch(e){
+    $('wrap-bn-amt').classList.add('bad')
+    why('burn', 'Rejected by the pool: ' + errText(e))
+  }
 }
 async function doBurn(){
-  const v=document.getElementById('bn-amt').value
-  if(!v||parseFloat(v)<=0){ setStatus('Введите сумму','error'); return }
-  try{
-    const raw=parseAmt(v,18), q=await pool.quote_burn(burnSel,raw)
-    setStatus('Сжигаю…','info')
-    await (await pool.burn(burnSel,raw,minOut(q,slip.bn))).wait()
-    setStatus(`Получено ${fmt(q,DEC[burnSel],4)} ${NAMES[burnSel]}`,'success')
-    await loadAll()
-  }catch(e){ setStatus(errText(e),'error') }
-}
-async function doPropMint(){
-  const v=document.getElementById('pm-bsk').value
-  if(!v||parseFloat(v)<=0){ setStatus('Введите сумму','error'); return }
-  try{
-    const raw=parseAmt(v,18)
-    const [net,am]=await pool.quote_mint_proportional(raw)
-    for(let i=0;i<N;i++) if(am[i].gt(0)) await ensureApprove(TKN[i],am[i],NAMES[i])
-    setStatus('Вношу корзиной…','info')
-    await (await pool.mint_proportional(am,net.mul(9990).div(10000))).wait()
-    setStatus(`Получено ${fmt(net,18,4)} BSKUSD`,'success')
-    document.getElementById('pm-bsk').value=''
-    await loadAll()
-  }catch(e){ setStatus(errText(e),'error') }
-}
-async function doPropBurn(){
-  const v=document.getElementById('pb-bsk').value
-  if(!v||parseFloat(v)<=0){ setStatus('Введите сумму','error'); return }
-  if(forfeit.slice(0,N).every(x=>x)){ setStatus('Нельзя отказаться от всех слотов — вы сожгли бы BSKUSD ни за что.','error'); return }
-  try{
-    const raw=parseAmt(v,18)
-    const am=await pool.quote_burn_proportional(raw)
-    // при отказе минимум по слоту обязан быть нулём
-    const mins=am.map((a,i)=> forfeit[i]?ethers.BigNumber.from(0):a.mul(9900).div(10000))
-    setStatus('Вывожу корзиной…','info')
-    await (await pool.burn_proportional(raw,mins,forfeit)).wait()
-    setStatus(`Выведено ${v} BSKUSD корзиной`,'success')
-    document.getElementById('pb-bsk').value=''
-    await loadAll()
-  }catch(e){ setStatus(errText(e),'error') }
+  if (!burnQuote) return
+  const { slot, amt, out } = burnQuote
+  await tx('Withdraw', () => pool.burn(slot, amt, minOut(out)),
+           { clear: ['bn-amt', 'bn-out'], after: [quoteBurn] })
 }
 
-// ---------- стейкинг ----------
-async function loadStake(){
-  const p=pool||poolRO, zero=ethers.constants.AddressZero
-  try{ wsAddr=await p.wsUSD() }catch(e){ wsAddr=zero }
-  const off=document.getElementById('stake-off'), on=document.getElementById('stake-on')
-  if(!wsAddr||wsAddr===zero){ off.style.display='block'; on.style.display='none'; wsusd=null; return }
-  off.style.display='none'; on.style.display='block'
-  wsusd=new ethers.Contract(wsAddr,WSUSD_ABI,signer||rpc)
-  if(signer){ document.getElementById('btn-stake').disabled=false
-              document.getElementById('btn-unstake').disabled=false }
+/* ============================ basket ============================ */
+function setPropMode(m){
+  propMode = m
+  $('pr-in').style.display  = m === 'in'  ? 'block' : 'none'
+  $('pr-out').style.display = m === 'out' ? 'block' : 'none'
+  $('pr-tab-in').classList.toggle('on',  m === 'in')
+  $('pr-tab-out').classList.toggle('on', m === 'out')
+  requoteActive()
+}
+function breakdown(amounts, decs, names){
+  return `<div class="bal-grid" style="margin-bottom:8px">` + amounts.map((a, i) =>
+    `<div class="bal-item"><div class="bal-dot" style="background:${BARS[i]}"></div>
+      <div><div class="bal-name">${names[i]}</div>
+      <div class="bal-val">${fmtU(a, decs[i])}</div></div></div>`).join('') + `</div>`
+}
+
+let propInQuote = null
+async function quotePropIn(){
+  propInQuote = null; $('pi-breakdown').innerHTML = ''; $('pi-net').textContent = '—'
+  why('prop-in', ''); lock('btn-prop-in', true)
+  if (!snap) return
+  const want = parseU($('pi-amt').value, 18)
+  if (!want) return
   try{
-    const [ta,ts]=await Promise.all([wsusd.totalAssets(),wsusd.totalSupply()])
-    document.getElementById('sk-total').textContent=fmt(ta,18,2)+' BSKUSD'
-    document.getElementById('sk-rate').textContent = ts.gt(0)
-      ? '1 wsUSD = '+(parseFloat(ethers.utils.formatUnits(ta,18))/parseFloat(ethers.utils.formatUnits(ts,18))).toFixed(6)
-      : '1 wsUSD = 1.000000'
-    if(userAddr){
-      const mine=await wsusd.balanceOf(userAddr)
-      rawBal['ws']=mine
-      document.getElementById('sk-mine').textContent=fmt(mine,18,4)
-      const v = mine.gt(0) ? await wsusd.convertToAssets(mine) : ethers.BigNumber.from(0)
-      document.getElementById('sk-value').textContent=fmt(v,18,4)+' BSKUSD'
+    const [net, amounts] = await (pool || poolRO).quote_mint_proportional(want)
+    const need = amounts.slice(0, snap.n)
+    $('pi-breakdown').innerHTML = breakdown(need, snap.decs, snap.names)
+    $('pi-net').textContent = fmtU(net, 18) + ' BSKUSD'
+    const short = []
+    if (account) need.forEach((a, i) => {
+      const b = rawBal[snap.names[i]]
+      if (b && a.gt(b)) short.push(`${snap.names[i]} (need ${fmtU(a, snap.decs[i])}, have ${fmtU(b, snap.decs[i])})`)
+    })
+    if (short.length){ why('prop-in', 'Not enough: ' + short.join(', ')); return }
+    propInQuote = { need, net }
+    lock('btn-prop-in', !account)
+    if (!account) why('prop-in', 'Connect your wallet to deposit.')
+  }catch(e){ why('prop-in', 'Rejected by the pool: ' + errText(e)) }
+}
+async function doPropIn(){
+  if (!propInQuote) return
+  const { need, net } = propInQuote
+  for (let i = 0; i < snap.n; i++){
+    if (need[i].isZero()) continue
+    if (!await ensureAllowance(snap.addrs[i], need[i], snap.names[i])) return
+  }
+  const arr = []
+  for (let i = 0; i < MAX_COINS; i++) arr.push(i < snap.n ? need[i] : BN.from(0))
+  await tx('Deposit Basket', () => pool.mint_proportional(arr, minOut(net)),
+           { clear: ['pi-amt'], after: [quotePropIn] })
+}
+
+function setMaxPropOut(){
+  const b = rawBal.BSKUSD
+  if (!b){ setStatus('Balance not loaded yet.', 'error'); return }
+  $('po-amt').value = ethers.utils.formatUnits(b, 18)
+  quotePropOut()
+}
+let propOutQuote = null
+async function quotePropOut(){
+  propOutQuote = null; $('po-breakdown').innerHTML = ''
+  why('prop-out', ''); lock('btn-prop-out', true)
+  if (!snap) return
+  const amt = parseU($('po-amt').value, 18)
+  if (!amt) return
+  const mine = rawBal.BSKUSD
+  if (account && mine && amt.gt(mine)){
+    why('prop-out', `You hold ${fmtU(mine, 18, 4)} BSKUSD, which is less than this.`); return
+  }
+  try{
+    const outs = (await (pool || poolRO).quote_burn_proportional(amt)).slice(0, snap.n)
+    if (outs.every(o => o.isZero())){
+      why('prop-out', 'Too small — every slot rounds down to nothing.'); return
     }
-  }catch(e){ console.error('loadStake',e) }
+    $('po-breakdown').innerHTML = breakdown(outs, snap.decs, snap.names)
+    propOutQuote = { amt, outs }
+    lock('btn-prop-out', !account)
+    if (!account) why('prop-out', 'Connect your wallet to withdraw.')
+  }catch(e){ why('prop-out', 'Rejected by the pool: ' + errText(e)) }
 }
-async function qStake(){
-  if(!wsusd) return
-  const v=document.getElementById('sk-in').value, q=document.getElementById('sk-quote')
-  if(!v||parseFloat(v)<=0){ q.textContent='—'; return }
-  try{
-    const raw=parseAmt(v,18); if(!raw) return
-    q.textContent=fmt(await wsusd.previewDeposit(raw),18,6)+' wsUSD'
-    document.getElementById('sk-sub').textContent='Доля в вейле. Курс wsUSD к BSKUSD растёт по мере поступления комиссий.'
-  }catch(e){ q.textContent='Отклонено' }
-}
-async function qUnstake(){
-  if(!wsusd) return
-  const v=document.getElementById('sk-out').value, q=document.getElementById('un-quote')
-  if(!v||parseFloat(v)<=0){ q.textContent='—'; return }
-  try{
-    const raw=parseAmt(v,18); if(!raw) return
-    q.textContent=fmt(await wsusd.previewRedeem(raw),18,6)+' BSKUSD'
-    document.getElementById('un-sub').textContent='Возврат по текущему курсу вейла.'
-  }catch(e){ q.textContent='Отклонено' }
-}
-async function doStake(){
-  if(!wsusd){ setStatus('Вейл не подключён','error'); return }
-  const v=document.getElementById('sk-in').value
-  if(!v||parseFloat(v)<=0){ setStatus('Введите сумму','error'); return }
-  try{
-    const raw=parseAmt(v,18)
-    // approve выдаётся ВЕЙЛУ, а не пулу: пул тут обычный ERC-20
-    await ensureApprove(POOL_ADDR,raw,'BSKUSD',wsAddr)
-    const sh=await wsusd.previewDeposit(raw)
-    setStatus('Стейкаю…','info')
-    await (await wsusd.deposit(raw,userAddr)).wait()
-    setStatus(`Застейкано ${v} BSKUSD, получено ${fmt(sh,18,4)} wsUSD`,'success')
-    document.getElementById('sk-in').value=''
-    await loadAll(); await loadStake()
-  }catch(e){ setStatus(errText(e),'error') }
-}
-async function doUnstake(){
-  if(!wsusd){ setStatus('Вейл не подключён','error'); return }
-  const v=document.getElementById('sk-out').value
-  if(!v||parseFloat(v)<=0){ setStatus('Введите сумму','error'); return }
-  try{
-    const raw=parseAmt(v,18), a=await wsusd.previewRedeem(raw)
-    setStatus('Забираю…','info')
-    await (await wsusd.redeem(raw,userAddr,userAddr)).wait()
-    setStatus(`Забрано ${fmt(a,18,4)} BSKUSD`,'success')
-    document.getElementById('sk-out').value=''
-    await loadAll(); await loadStake()
-  }catch(e){ setStatus(errText(e),'error') }
+async function doPropOut(){
+  if (!propOutQuote) return
+  const { amt, outs } = propOutQuote
+  const mins = []
+  for (let i = 0; i < MAX_COINS; i++) mins.push(i < snap.n ? minOut(outs[i]) : BN.from(0))
+  await tx('Withdraw Basket', () => pool.burn_proportional(amt, mins),
+           { clear: ['po-amt'], after: [quotePropOut] })
 }
 
-// ---------- админ ----------
-function pbox(E,detail){
-  if(!E) return '<div class="pending-none">Ничего не запланировано.</div>'
-  return `<div class="pending">${detail||''}<br/>${E.when} — <b>${E.left}</b></div>`
+/* ============================ admin ============================ */
+function admSec(key, title, body){
+  return `<div class="adm-sec">
+    <div class="adm-head" onclick="toggleAdm('${key}')">
+      <span class="adm-title">${title}</span><span class="chev" id="achev-${key}">▾</span>
+    </div>
+    <div class="adm-body" id="abody-${key}">${body}</div></div>`
 }
-async function loadAdmin(){
-  if(!isAdmin) return
-  const p=pool||poolRO, zero=ethers.constants.AddressZero
-  try{
-    // VERSION удалён из контракта в v5.3.0: константа занимала место в
-    // байткоде, а доверять строке, которую возвращает проверяемый же
-    // контракт, смысла нет. Идентификация — по хешу кода.
-    const [adm,grd,tre,ws,init,na,tbp,nc]=await Promise.all([
-      p.admin(),p.guardian(),p.treasury(),p.wsUSD(),
-      p.initialized(),p.next_a_preview(),p.treasury_bp(),p.n_coins()])
-    const rows=[['активных слотов',nc.toString()+' из '+MAX_COINS],
-      ['админ',short(adm)],['guardian',grd===zero?'не назначен':short(grd)],
-      ['казна',short(tre)],['вейл',ws===zero?'не задан':short(ws)],
-      ['доля казны',(tbp.toNumber()/100)+'%'],['пул запущен',init?'да':'НЕТ'],
-      ['A после расширения',na.eq(0)?'расширение невозможно':na.toString()]]
-    document.getElementById('adm-state').innerHTML=rows.map(([k,v])=>
-      `<div class="adm-row"><span class="adm-k">${k}</span><span class="adm-v">${v}</span></div>`).join('')
-    document.getElementById('adm-bootstrap').style.display=init?'none':'block'
-    document.getElementById('adm-nexta').innerHTML = na.eq(0)
-      ? '<span style="color:var(--red)">next_a_preview = 0 — пятый слот добавить уже нельзя. Расширение требует A не ниже 13.</span>'
-      : `После добавления A станет <b>${na.toString()}</b>, потолок сузится до 40%, проскальзывание вырастет примерно вдвое.`
-
-    const paused=await Promise.all(Array.from({length:N},(_,i)=>p.paused(i)))
-    document.getElementById('adm-pause').innerHTML=Array.from({length:N},(_,i)=>
-      `<button class="btn-sm ${paused[i]?'danger':''}" onclick="admCall('${paused[i]?'unpause_token':'pause_token'}',[${i}])">
-        ${NAMES[i]||('слот '+i)}: ${paused[i]?'снять':'пауза'}</button>`).join('')
-
-    // комиссии
-    const [fm,fs,fb]=await p.fees()
-    const cap=await p.FEE_MAX_BP()
-    // Сроки читаем с контракта, а не пишем в интерфейсе: в тестовой сети
-    // они укорочены до часа, в мейннете должны быть 7 и 14 дней.
-    try{
-      FEE_TIMES.delay  = (await p.FEE_DELAY()).toNumber()
-      FEE_TIMES.window = (await p.FEE_WINDOW()).toNumber()
-    }catch(e){}
-    document.getElementById('adm-fees-now').innerHTML=
-      `<div class="fee3">
-        <div class="f3"><div class="f3-k">вход</div><div class="f3-v">${fm}</div></div>
-        <div class="f3"><div class="f3-k">обмен</div><div class="f3-v">${fs}</div></div>
-        <div class="f3"><div class="f3-k">выход</div><div class="f3-v">${fb}</div></div>
-      </div>`
-    const [pm,psw,pb2,peta]=await p.pending_fees()
-    document.getElementById('adm-fees-pending').innerHTML=
-      pbox(eta(peta), peta.eq(0)?null:`станет ${pm} / ${psw} / ${pb2} (вход / обмен / выход)`)
-    const sum=fm.toNumber()+fb.toNumber()
-    document.getElementById('adm-fee-note').innerHTML =
-      `Значения в базисных пунктах, потолок ${cap}. Один пункт — 0.01%. Все три меняются вместе, любым шагом.`
-      + ` Уведомление ${fmtDur(FEE_TIMES.delay)}, окно применения ${fmtDur(FEE_TIMES.window)}.`
-      + `<br/>Ориентир, который контракт НЕ проверяет: <b>обмен ≤ вход + выход</b>. `
-      + `Иначе тот же обмен дешевле сделать в два шага, и платить за него станут только те, кто не знает про обход.`
-      + (fs.toNumber()>sum ? `<br/><span style="color:var(--red)">Сейчас ориентир нарушен: обмен ${fs} против ${sum}.</span>` : '')
-
-    const [pt,pta,ptm]=await Promise.all([p.pending_token_eta(),p.pending_token(),p.pending_token_amt()])
-    document.getElementById('adm-add-pending').innerHTML=pbox(eta(pt),pt.eq(0)?null:`Токен ${short(pta)}, сумма ${ptm.toString()}`)
-    const [pa,pav]=await Promise.all([p.pending_a_eta(),p.pending_a()])
-    document.getElementById('adm-a-pending').innerHTML=pbox(eta(pa),pa.eq(0)?null:`A станет ${pav.toString()}`)
-    const [ps,psv]=await Promise.all([p.pending_split_eta(),p.pending_treasury_bp()])
-    document.getElementById('adm-split-pending').innerHTML=pbox(eta(ps),ps.eq(0)?null:`доля казны станет ${psv.toNumber()/100}%`)
-
-    const rots=await Promise.all(Array.from({length:N},async(_,i)=>{
-      const [t,a,f,e]=await Promise.all([p.rot_token(i),p.rot_amount(i),p.rot_funder(i),p.rot_eta(i)])
-      return {i,t,a,f,e} }))
-    const act=rots.filter(r=>r.t!==zero)
-    document.getElementById('adm-rot-state').innerHTML = act.length===0
-      ? '<div class="pending-none">Замен не запланировано.</div>'
-      : act.map(r=>{ const E=eta(r.e)
-          return `<div class="pending"><b>Слот ${r.i} → ${short(r.t)}</b><br/>
-            эскроу ${r.a.toString()} от ${short(r.f)}<br/>
-            ${r.e.eq(0)?'не объявлена':`исполнение ${E.when} — ${E.left}`}</div>` }).join('')
-  }catch(e){ console.error('loadAdmin',e) }
+function toggleAdm(k){
+  $('abody-' + k).classList.toggle('open')
+  $('achev-' + k).classList.toggle('open')
 }
-async function admCall(fn,args){
-  if(!signer){ setStatus('Подключите кошелёк','error'); return }
-  try{
-    args.forEach(a=>{ if(typeof a==='string'&&a==='') throw new Error('Заполните все поля') })
-    setStatus('Отправляю '+fn+'…','info')
-    const rc=await (await pool[fn](...args)).wait()
-    setStatus(fn+' выполнено · '+rc.transactionHash.slice(0,12)+'…','success')
-    await loadAll()
-  }catch(e){ setStatus(fn+': '+errText(e),'error') }
+function slotOptions(){
+  return (snap?.names || []).map((n, i) =>
+    `<option value="${i}">${i} — ${n}${snap.paused[i] ? ' (paused)' : ''}</option>`).join('')
 }
 
-// ---------- старт ----------
-;(async()=>{
-  ;['bal','lim','fee'].forEach(k=>{
-    if(store.get('bskusd:ui:'+k)==='1'){
-      document.getElementById('body-'+k).classList.add('open')
-      document.getElementById('chev-'+k).classList.add('open')
+function renderAdmin(){
+  const el = $('pnl-admin')
+  if (!isAdmin && !isPauser){
+    el.innerHTML = `<div class="note">This tab is for the administrator. Connect the admin wallet
+      to use it. Everything here is announced in advance and visible to everyone in
+      <b>Announced Changes</b>.</div>`
+    return
+  }
+  const onlyPauser = !isAdmin && isPauser
+  let html = ''
+
+  html += admSec('pause', 'Pause A Slot', `
+    <select class="adm-in" id="ad-pause-slot">${slotOptions()}</select>
+    <div class="adm-row3">
+      <button class="btn-s dn" onclick="adm('pause_token',[+$('ad-pause-slot').value],'Pause')">Pause</button>
+      <button class="btn-s" onclick="adm('unpause_token',[+$('ad-pause-slot').value],'Unpause')"
+        ${onlyPauser ? 'disabled' : ''}>Unpause</button>
+    </div>
+    <div class="note">A pause closes deposits and swaps into that asset. Withdrawals always keep
+      working. The pauser can pause; only the admin can unpause, and not before the minimum
+      pause age has elapsed.</div>`)
+
+  if (onlyPauser){ el.innerHTML = html; return }
+
+  html += admSec('fees', 'Fees', `
+    <div class="adm-row3" style="margin-bottom:6px">
+      <input class="adm-in" id="ad-fm" type="number" min="0" max="6" placeholder="deposit"/>
+      <input class="adm-in" id="ad-fs" type="number" min="0" max="6" placeholder="swap"/>
+      <input class="adm-in" id="ad-fb" type="number" min="0" max="6" placeholder="withdraw"/>
+    </div>
+    <div class="adm-row3">
+      <button class="btn-s go" onclick="adm('schedule_fees',[+$('ad-fm').value,+$('ad-fs').value,+$('ad-fb').value],'Schedule Fees',['ad-fm','ad-fs','ad-fb'])">Announce</button>
+      <button class="btn-s" onclick="adm('apply_fees',[],'Apply Fees')">Apply</button>
+      <button class="btn-s dn" onclick="adm('cancel_fees',[],'Cancel Fees')">Cancel</button>
+    </div>
+    <div class="note">In basis points, ceiling 6 each. Keep deposit plus withdrawal above the swap
+      fee, otherwise arbitrage routes around the swap path.</div>`)
+
+  html += admSec('ann', 'Curve Amplification', `
+    <input class="adm-in" id="ad-ann" type="number" placeholder="new ann"/>
+    <div class="adm-row3">
+      <button class="btn-s go" onclick="adm('schedule_ann_change',[$('ad-ann').value],'Schedule Amplification',['ad-ann'])">Announce</button>
+      <button class="btn-s" onclick="adm('apply_ann_change',[],'Apply Amplification')">Apply</button>
+      <button class="btn-s dn" onclick="adm('cancel_ann_change',[],'Cancel Amplification')">Cancel</button>
+    </div>
+    <div class="note" id="ad-ann-note"></div>`)
+
+  html += admSec('add', 'Add An Asset', `
+    <input class="adm-in" id="ad-tok" placeholder="token address"/>
+    <input class="adm-in" id="ad-tok-amt" placeholder="amount in the token's own units"/>
+    <div class="adm-row3">
+      <button class="btn-s go" onclick="adm('schedule_add_token',[$('ad-tok').value,$('ad-tok-amt').value],'Announce Asset',['ad-tok','ad-tok-amt'])">Announce</button>
+      <button class="btn-s" onclick="adm('execute_add_token',[0],'Add Asset')">Execute</button>
+      <button class="btn-s dn" onclick="adm('cancel_add_token',[],'Cancel Asset')">Cancel</button>
+    </div>
+    <div class="note">Approve the token for the pool first. Amplification is <b>not</b> touched by
+      an expansion — the curve stays exactly as it is. The contribution must be large enough to
+      raise the invariant, roughly one to two percent of a slot.</div>`)
+
+  html += admSec('rot', 'Replace A Dead Slot', `
+    <select class="adm-in" id="ad-rot-slot">${slotOptions()}</select>
+    <input class="adm-in" id="ad-rot-tok" placeholder="replacement token address"/>
+    <input class="adm-in" id="ad-rot-amt" placeholder="escrow amount"/>
+    <div class="adm-row3" style="margin-bottom:6px">
+      <button class="btn-s" onclick="adm('fund_rotation',[+$('ad-rot-slot').value,$('ad-rot-tok').value,$('ad-rot-amt').value],'Fund Rotation',['ad-rot-tok','ad-rot-amt'])">Fund</button>
+      <button class="btn-s go" onclick="adm('schedule_rotation',[+$('ad-rot-slot').value],'Announce Rotation')">Announce</button>
+      <button class="btn-s" onclick="adm('execute_rotation',[+$('ad-rot-slot').value],'Execute Rotation')">Execute</button>
+    </div>
+    <div class="adm-row3">
+      <button class="btn-s dn" onclick="adm('cancel_rotation',[+$('ad-rot-slot').value],'Cancel Rotation')">Cancel</button>
+      <button class="btn-s" onclick="adm('reclaim_rotation',[+$('ad-rot-slot').value],'Reclaim Escrow')">Reclaim</button>
+    </div>
+    <div class="note">Order: pause the slot, wait out the minimum pause age, fund the replacement,
+      announce, then execute. Anything that cannot be transferred back lands in the claim queue
+      rather than being lost.</div>`)
+
+  html += admSec('split', 'Fee Split And Vault', `
+    <input class="adm-in" id="ad-split" type="number" placeholder="treasury share, bp"/>
+    <div class="adm-row3" style="margin-bottom:6px">
+      <button class="btn-s go" onclick="adm('schedule_split',[$('ad-split').value],'Announce Split',['ad-split'])">Announce</button>
+      <button class="btn-s" onclick="adm('apply_split',[],'Apply Split')">Apply</button>
+      <button class="btn-s dn" onclick="adm('cancel_split',[],'Cancel Split')">Cancel</button>
+    </div>
+    <input class="adm-in" id="ad-vault" placeholder="staking vault address"/>
+    <input class="adm-in" id="ad-vault-bp" type="number" placeholder="treasury share, bp"/>
+    <button class="btn-s dn" style="width:100%"
+      onclick="adm('set_staking_vault',[$('ad-vault').value,$('ad-vault-bp').value],'Set Vault',['ad-vault','ad-vault-bp'])">Set Vault And Share (One Time)</button>
+    <div class="note"><b>set_staking_vault takes effect immediately, with no announcement</b> — it is
+      the only call that can move the fee flow at once. Announce the target share publicly before
+      calling it. Corridor 500–9500 bp, at most 1000 bp per step; you cannot go back to 100 %
+      treasury.</div>`)
+
+  html += admSec('owner', 'Hand Over Administration', `
+    <input class="adm-in" id="ad-pauser" placeholder="pauser address (zero address revokes)"/>
+    <button class="btn-s" style="width:100%;margin-bottom:8px"
+      onclick="adm('set_pauser',[$('ad-pauser').value],'Set Pauser',['ad-pauser'])">Set Pauser</button>
+    <input class="adm-in" id="ad-admin" placeholder="new admin address"/>
+    <div class="adm-row3">
+      <button class="btn-s go" onclick="adm('propose_admin',[$('ad-admin').value],'Propose Admin',['ad-admin'])">Propose</button>
+      <button class="btn-s" onclick="adm('accept_admin',[],'Accept Admin')">Accept</button>
+    </div>
+    <div class="note">Two steps: rights stay with the current admin until the new address accepts.</div>`)
+
+  if (snap && !snap.initialized){
+    html = admSec('boot', 'Launch The Pool', `
+      <div class="note" style="margin:0 0 8px">bootstrap pulls the seed amounts from your address
+        and mints the initial supply. Approve every token for the pool first. Callable once.</div>
+      <button class="btn-s go" style="width:100%" onclick="adm('bootstrap',[],'Bootstrap')">Bootstrap</button>`) + html
+  }
+  el.innerHTML = html
+
+  const note = $('ad-ann-note')
+  if (note && snap){
+    const cur = snap.ann
+    note.innerHTML = `Current <b>${cur.toLocaleString('en-US')}</b>. A step may at most double or
+      halve it, so this round allows <b>${Math.ceil(cur / 2).toLocaleString('en-US')} …
+      ${(cur * 2).toLocaleString('en-US')}</b>. Lower means the pool notices a skew sooner and bots
+      rebalance it earlier; higher means a tighter peg and less slippage. The basket must be within
+      ±30 % of even for the change to apply.`
+  }
+}
+
+async function adm(fn, args, label, clear){
+  if (!signer){ setStatus('Connect your wallet first.', 'error'); return }
+  for (const a of args){
+    if (typeof a === 'string' && a.trim() === ''){
+      setStatus('Fill in every field for ' + label + '.', 'error'); return
     }
+  }
+  await tx(label, () => pool[fn](...args), { clear: clear || [] })
+}
+
+/* ============================ startup ============================ */
+;(async () => {
+  renderSlipRows()
+  ;['bal', 'lim', 'fee', 'tech'].forEach(k => {
+    try { if (localStorage.getItem('bskusd:ui:' + k) === '1') toggleCollapse(k) } catch {}
   })
+  $('net-pill').textContent = NET_NAME
   try{
     await loadBasket()
     await loadStats()
-    await Promise.all([loadFeeRates(),loadFees(),loadPending(),loadLimits(),loadStake()])
+    await Promise.all([loadBalances(), loadFeeRates(), loadFeeSplit(),
+                       loadLimits(), loadTech(), loadPending()])
+    renderAdmin()
     loadPrices()
+    if (window.ethereum && (await window.ethereum.request({ method: 'eth_accounts' })).length){
+      await connectWallet()
+    }
   }catch(e){
-    setStatus('Не удалось прочитать пул. Проверьте адрес контракта и сеть.','error')
+    setStatus('Could not read the pool. Check the contract address and the network.', 'error')
     console.error(e)
   }
-
-  // Состав меняется от чужих сделок. Без этого страница показывала бы
-  // снимок момента загрузки, и котировка расходилась бы с реальностью.
-  // Обновляем не чаще раза в 12 секунд, чтобы не молотить RPC.
-  let last = 0
-  rpc.on('block', async ()=>{
-    const now = Date.now()
-    if (now - last < 12000) return
-    last = now
-    try{ await loadStats(); await loadLimits(); renderPrices() }catch(e){}
-  })
+  if (window.ethereum){
+    window.ethereum.on('accountsChanged', () => location.reload())
+    window.ethereum.on('chainChanged',    () => location.reload())
+  }
+  setInterval(() => { if (snap) loadStats().catch(() => {}) }, 30000)
 })()
 </script>
 </body>
