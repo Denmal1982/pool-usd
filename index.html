@@ -218,6 +218,13 @@ body{background:var(--bg0);color:var(--txt);font-family:var(--font);min-height:1
   </div>
 </nav>
 
+<div id="compat" style="display:none;margin:14px 28px 0;background:var(--red-bg);
+     border:1px solid var(--red);border-radius:12px;padding:14px 16px">
+  <div style="font-size:15px;font-weight:700;color:var(--red);margin-bottom:6px">
+    Contract Does Not Match This Page</div>
+  <div style="font-size:12px;color:var(--txt2);line-height:1.6" id="compat-text"></div>
+</div>
+
 <div class="main">
 
   <!-- ================= left column ================= -->
@@ -667,9 +674,12 @@ async function connectWallet(){
     $('btn-wallet').textContent = 'Connected'
     $('btn-wallet').classList.add('connected')
     $('addr-display').textContent = shortAddr(account)
-    const [adm, psr] = await Promise.all([poolRO.admin(), poolRO.pauser()])
+    // Каждый геттер читается отдельно: отсутствие одного не должно
+    // обрывать подключение целиком.
+    const adm = await poolRO.admin().catch(() => ZERO)
+    const psr = await poolRO.pauser().catch(() => ZERO)
     isAdmin  = adm.toLowerCase() === account.toLowerCase()
-    isPauser = psr.toLowerCase() === account.toLowerCase()
+    isPauser = psr !== ZERO && psr.toLowerCase() === account.toLowerCase()
     if (isAdmin || isPauser){
       $('admin-pill').style.display = 'inline-block'
       $('admin-pill').textContent = isAdmin ? 'Admin' : 'Pauser'
@@ -1455,6 +1465,37 @@ async function adm(fn, args, label, clear){
   await tx(label, () => pool[fn](...args), { clear: clear || [] })
 }
 
+/* ============================ compatibility ============================ */
+/* Страница написана под конкретную версию контракта. Если по адресу лежит
+   другая, почти каждый вызов отвечает «execution reverted», и без явной
+   проверки это выглядит как необъяснимая поломка кошелька. */
+const NEEDS = [
+  ['ann',    () => poolRO.ann()],
+  ['coins',  () => poolRO.coins(0)],
+  ['balances', () => poolRO.balances(0)],
+  ['pauser', () => poolRO.pauser()],
+  ['MIN_ANN', () => poolRO.MIN_ANN()],
+]
+async function checkContract(){
+  const missing = []
+  for (const [name, call] of NEEDS){
+    try { await call() } catch { missing.push(name + '()') }
+  }
+  if (!missing.length) return true
+  $('compat').style.display = 'block'
+  $('compat-text').innerHTML = `
+    This page expects <b>BSKUSD v5.9.0</b>. The contract at
+    <span class="addr-mono">${POOL_ADDR}</span> on chain ${CHAIN_ID} does not provide
+    ${missing.map(m => '<code>' + m + '</code>').join(', ')},
+    so it is an earlier version.<br/><br/>
+    Deploy v5.9.0 and set <code>POOL_ADDR</code> at the top of this file to the new address.
+    Until then nothing on this page will load.`
+  document.querySelector('.main').style.opacity = '.35'
+  document.querySelector('.main').style.pointerEvents = 'none'
+  $('btn-wallet').disabled = true
+  return false
+}
+
 /* ============================ startup ============================ */
 ;(async () => {
   renderSlipRows()
@@ -1462,6 +1503,7 @@ async function adm(fn, args, label, clear){
     try { if (localStorage.getItem('bskusd:ui:' + k) === '1') toggleCollapse(k) } catch {}
   })
   $('net-pill').textContent = NET_NAME
+  if (!(await checkContract())) return
   try{
     await loadBasket()
     await loadStats()
